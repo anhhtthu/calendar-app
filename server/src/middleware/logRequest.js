@@ -1,0 +1,43 @@
+const logger = require("../utils/logger");
+
+function logRequest(req, res, next) {
+  const { method, url, headers, query, body } = req;
+
+  // anonymize or omit sensitive information
+  const safeHeaders = { ...headers };
+  if (safeHeaders.authorization) {
+    safeHeaders.authorization = "***";
+  }
+
+  const bodyLog = body
+    ? JSON.stringify(body).substring(0, 100) +
+      (JSON.stringify(body).length > 100 ? "..." : "")
+    : "No Body";
+
+//   const logMessage = `
+//   ${method} ${url} 
+//   - Headers: ${JSON.stringify(safeHeaders)} 
+//   - Query: ${JSON.stringify(query)} 
+//   - Body: ${bodyLog}
+//   `;
+//   logger.info(logMessage);
+
+  // log response status and time
+  const start = Date.now();
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    logger.infof(
+      "status: %d - method: %s %s - %dms - query: %v - body: %s",
+      res.statusCode,
+      method,
+      url,
+      duration,
+      JSON.stringify(query),
+      bodyLog
+    );
+  });
+
+  next();
+}
+
+module.exports = logRequest;
