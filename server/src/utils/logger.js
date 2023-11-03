@@ -53,12 +53,14 @@ logger.infof = async function (message, ...args) {
   const callerInfo = await getCallerInfo();
   const formattedMessage = sprintf(message, ...args);
   this.info(`${callerInfo} - ${formattedMessage}`);
+  // this.info(`${formattedMessage}`);
 };
 
 logger.errorf = async function (message, ...args) {
   const callerInfo = await getCallerInfo();
   const formattedMessage = sprintf(message, ...args);
   this.error(`${callerInfo} - ${formattedMessage}`);
+  // this.error(`${formattedMessage}`);
 };
 
 module.exports = logger;
