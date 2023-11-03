@@ -10,10 +10,10 @@ function App() {
   const [currentMonth, setCurrentMonth] = useState(getMonth());
   return (
     <div className="App">
-      <div className="h-screen flex flex-columns">
-        <Header />
-        <div className="flex flex-1">
-          <Sidebar />
+      <div className="h-screen flex flex-1">
+        <Sidebar />
+        <div className="flex flex-1 flex-col">
+          <Header />
           <div className="flex flex-1 flex-col">
             <WeekBar />
             <Month month={currentMonth} />

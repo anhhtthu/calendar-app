@@ -6,6 +6,7 @@ module.exports = {
       fontFamily: {
         display: "Inter, sans-serif",
       },
+
       borderRadius: {
         none: "0",
         sm: ".125rem",
