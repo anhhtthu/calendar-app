@@ -1,13 +1,13 @@
 const errorHandler = require("./errorHandler");
 const logRequest = require("./logRequest");
 const bodyParser = require("./bodyParser");
-const validation = require("./validation");
 const cors = require("./cors");
+const responseFormat = require("./responseFormat")
 
 module.exports = {
   errorHandler,
   logRequest,
   bodyParser,
-  validation,
   cors,
+  responseFormat
 };
