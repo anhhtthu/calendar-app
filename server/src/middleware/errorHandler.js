@@ -7,7 +7,7 @@ function errorHandler(err, req, res, next) {
     return next(res);
   }
 
-  // define default error
+  // Define default error
   let message = "Server error";
   let errorCode = -1;
   let statusCode = err.status || 500;
