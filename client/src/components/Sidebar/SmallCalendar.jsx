@@ -10,7 +10,13 @@ export default function SmallCalendar() {
   const [currentMonthSmallCalendarIdx, setCurrentMonthSmallCalendarIdx] =
     useState(dayjs().month());
   const [monthSmallCalendar, setMonthSmallCalendar] = useState(getMonth());
-  const { monthIndex, trigger } = useContext(GlobalContext);
+  const {
+    monthIndex,
+    trigger,
+    setSmallCalendarMonth,
+    selectedDate,
+    setSelectedDate,
+  } = useContext(GlobalContext);
 
   useEffect(() => {
     setCurrentMonthSmallCalendarIdx(monthIndex);
@@ -31,12 +37,19 @@ export default function SmallCalendar() {
   function isToday(day) {
     const format = "DD-MM-YYYY";
     const today = dayjs().format(format);
+    const secDate = selectedDate && selectedDate.format(format);
     const currentDay = day.format(format);
     if (today === currentDay) {
-      return "bg-violet-600 text-white rounded";
+      return "bg-violet-600 text-white rounded-md";
+    } else if (secDate === currentDay) {
+      return "bg-violet-200 text-violet rounded-md";
     } else {
       return "text-gray-500";
     }
+  }
+
+  function handleSelected() {
+    setSmallCalendarMonth(currentMonthSmallCalendarIdx);
   }
 
   return (
@@ -64,7 +77,14 @@ export default function SmallCalendar() {
           <React.Fragment key={index}>
             {row.map((day, index) => {
               return (
-                <button key={index} className={`py-1 w-full ${isToday(day)}`}>
+                <button
+                  key={index}
+                  className={`py-1 w-full ${isToday(day)}`}
+                  onClick={() => {
+                    setSelectedDate(day);
+                    handleSelected();
+                  }}
+                >
                   <span className={`text-sm`}>{day.format("D")}</span>
                 </button>
               );
