@@ -42,7 +42,7 @@ export default function SmallCalendar() {
     if (today === currentDay) {
       return "bg-violet-600 text-white rounded-md";
     } else if (secDate === currentDay) {
-      return "bg-violet-200 text-violet rounded-md";
+      return "bg-violet-200 text-violet-600 rounded-md text-bold";
     } else {
       return "text-gray-500";
     }
