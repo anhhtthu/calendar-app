@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Calendar from "./pages/Calendar";
 import MonthViewCalendar from "./pages/MonthViewCalendar";
+import WeekViewCalendar from "./pages/WeekViewCalendar";
 
 function App() {
   return (
@@ -12,7 +13,9 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/calendar" element={<Calendar />}>
-        <Route path="" element={<MonthViewCalendar />} />
+        <Route index element={<Navigate to="monthview" replace />} />
+        <Route path="monthview" element={<MonthViewCalendar />} />
+        <Route path="weekview" element={<WeekViewCalendar />} />
       </Route>
     </Routes>
   );

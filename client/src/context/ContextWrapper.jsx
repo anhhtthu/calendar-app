@@ -7,10 +7,12 @@ export default function ContextWrapper({ children }) {
   const [trigger, setTrigger] = useState(false);
   const [smallCalendarMonth, setSmallCalendarMonth] = useState(null);
   const [selectedDate, setSelectedDate] = useState(0);
+  const [weekIndex, setWeekIndex] = useState(dayjs());
 
   useEffect(() => {
     if (smallCalendarMonth !== null) {
       setMonthIndex(smallCalendarMonth);
+      setWeekIndex(smallCalendarMonth);
     }
   }, [smallCalendarMonth]);
 
@@ -25,6 +27,8 @@ export default function ContextWrapper({ children }) {
         setSmallCalendarMonth,
         selectedDate,
         setSelectedDate,
+        weekIndex,
+        setWeekIndex,
       }}
     >
       {children}

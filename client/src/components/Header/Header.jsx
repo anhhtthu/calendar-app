@@ -6,7 +6,7 @@ import SelectedTimeDisplay from "./SelectedTimeDisplay";
 
 export default function Header() {
   return (
-    <div className="flex justify-between px-5 py-3 mb-5 items-center border-b">
+    <div className="flex h-fit justify-between px-5 py-3 mb-5 items-center border-b">
       <div className="w-1/3 flex justify-start">
         <SelectedTimeDisplay />
       </div>

@@ -5,19 +5,28 @@ import GlobalContext from "../../context/GlobalContext";
 import dayjs from "dayjs";
 
 export default function NavigateButton() {
-  const { monthIndex, setMonthIndex, trigger, setTrigger } =
-    useContext(GlobalContext);
+  const {
+    monthIndex,
+    setMonthIndex,
+    trigger,
+    setTrigger,
+    setWeekIndex,
+    weekIndex,
+  } = useContext(GlobalContext);
 
   function handlePrevMonth() {
     setMonthIndex(monthIndex - 1);
+    setWeekIndex(weekIndex.subtract(1, "week"));
   }
 
   function handleNextMonth() {
     setMonthIndex(monthIndex + 1);
+    setWeekIndex(weekIndex.add(1, "week"));
   }
 
   function handleThisMonth() {
     setMonthIndex(dayjs().month());
+    setWeekIndex(dayjs().startOf("week"));
     setTrigger(!trigger);
   }
 
