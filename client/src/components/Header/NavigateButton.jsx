@@ -5,24 +5,33 @@ import GlobalContext from "../../context/GlobalContext";
 import dayjs from "dayjs";
 
 export default function NavigateButton() {
-  const { monthIndex, setMonthIndex, trigger, setTrigger } =
-    useContext(GlobalContext);
+  const {
+    monthIndex,
+    setMonthIndex,
+    trigger,
+    setTrigger,
+    setWeekIndex,
+    weekIndex,
+  } = useContext(GlobalContext);
 
   function handlePrevMonth() {
     setMonthIndex(monthIndex - 1);
+    setWeekIndex(weekIndex.subtract(1, "week"));
   }
 
   function handleNextMonth() {
     setMonthIndex(monthIndex + 1);
+    setWeekIndex(weekIndex.add(1, "week"));
   }
 
   function handleThisMonth() {
     setMonthIndex(dayjs().month());
+    setWeekIndex(dayjs().startOf("week"));
     setTrigger(!trigger);
   }
 
   return (
-    <div className="flex flex-row items-center px-3 py-1 border rounded text-gray-600">
+    <div className="flex flex-row items-center px-1 py-1 border border-gray-300 rounded-md text-gray-600">
       <button onClick={handlePrevMonth}>
         <BsChevronLeft className="cursor-pointer" />
       </button>

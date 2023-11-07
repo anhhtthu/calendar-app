@@ -14,7 +14,7 @@ export default function DayInMonth(props) {
         isToday() ? monthStyles.today : "border-gray-200"
       } flex flex-row px-2`}
     >
-      <p className="text-md font-medium p-1 my-1 text-left">
+      <p className="text-md text-gray-500 font-semibold p-1 my-1 text-left">
         {day.format("DD")}
       </p>
       {isToday() && <span className={monthStyles.isToday}></span>}

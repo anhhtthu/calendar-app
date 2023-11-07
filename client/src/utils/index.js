@@ -12,3 +12,18 @@ export function getMonth(month = dayjs().month()) {
   });
   return generateMonthDaysMatrix;
 }
+
+export function getWeek(day = dayjs()) {
+  const startOfWeek = day.startOf("week");
+  let generateHour = 0;
+  const generateWeekHoursMatrix = new Array(24).fill(null).map(() => {
+    generateHour++;
+    return new Array(7).fill(null).map((dayOffSet, index) => {
+      return startOfWeek
+        .clone()
+        .add(index, "day")
+        .hour(generateHour % 24);
+    });
+  });
+  return generateWeekHoursMatrix;
+}
