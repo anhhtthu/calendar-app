@@ -1,14 +1,18 @@
 const express = require("express");
-const router = express.Router();
 const eventController = require("../controllers/eventController");
 const { authenticateToken } = require("../middleware/authenticateToken");
+const ROUTES = require('../constants/routePaths')
+
+const router = express.Router();
 
 // Require authenticate JWT
-router.use(authenticateToken);
+// router.use(authenticateToken);
 
-router.get("/", eventController.getEvents);
-router.post("/", eventController.createEvent);
-router.put("/:eventId", eventController.updateEvent);
-router.delete("/:eventId", eventController.deleteEvent);
+router.get(ROUTES.EVENTS.GET, (req, res, next) => {
+    res.sendData({ foo: "bar" }, "Data fetched successfully");
+});
+// router.post(ROUTES.EVENTS.CREATE, eventController.createEvent);
+// router.put(ROUTES.EVENTS.UPDATE, eventController.updateEvent);
+// router.delete(ROUTES.EVENTS.DELETE, eventController.deleteEvent);
 
 module.exports = router;
