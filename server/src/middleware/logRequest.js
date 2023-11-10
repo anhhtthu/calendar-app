@@ -1,4 +1,4 @@
-const logger = require("../utils/logger");
+const { logger } = require("../utils/logger");
 
 function logRequest(req, res, next) {
   const { method, url, headers, query, body } = req;
@@ -14,15 +14,7 @@ function logRequest(req, res, next) {
       (JSON.stringify(body).length > 100 ? "..." : "")
     : "No Body";
 
-//   const logMessage = `
-//   ${method} ${url} 
-//   - Headers: ${JSON.stringify(safeHeaders)} 
-//   - Query: ${JSON.stringify(query)} 
-//   - Body: ${bodyLog}
-//   `;
-//   logger.info(logMessage);
-
-  // log response status and time
+  // Log response status and time
   const start = Date.now();
   res.on("finish", () => {
     const duration = Date.now() - start;

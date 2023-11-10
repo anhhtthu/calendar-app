@@ -1,18 +1,16 @@
 const express = require("express");
-const logger = require("./utils/logger");
 const { errorHandler, logRequest, bodyParser, cors, responseFormat } = require("./middleware");
 const CustomError = require("./utils/customError");
-require("dotenv").config();
 
-const ROUTES = require('./constants/routePaths')
-const eventRoutes = require('./routes/eventRoutes')
+const ROUTES = require("./constants/routePaths");
+const eventRoutes = require("./routes/eventRoutes");
 
 const app = express();
 
-app.use(bodyParser)
-app.use(logRequest)
-app.use(cors)
-app.use(responseFormat)
+app.use(bodyParser);
+app.use(logRequest);
+app.use(cors);
+app.use(responseFormat);
 
 // Routes
 // app.get("/", (req, res, next) => {
@@ -28,13 +26,12 @@ app.use(responseFormat)
 //     throw new CustomError(123, "Custom error message", 400);
 // });
 
-app.use(ROUTES.EVENTS.BASE, eventRoutes)
+app.use(ROUTES.EVENTS.BASE, eventRoutes);
 
-// catch all unhandled routes
+// Catch all unhandled routes and other errors
 app.use((req, res, next) => {
-    next(new CustomError(404, "Route Not Found", 404))
+  next(new CustomError(404, "Route Not Found", 404));
 });
-
 app.use(errorHandler);
 
 module.exports = app;

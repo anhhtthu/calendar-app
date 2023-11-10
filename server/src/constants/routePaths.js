@@ -1,19 +1,22 @@
-const API_BASE = "/api/v1";
+const config = require("../configs/config");
+
+const BASE_URL = config.base_url;
 
 const ROUTES = {
   // User Authentication Route
   AUTH: {
-    BASE: `${API_BASE}/auth`,
+    BASE: `${BASE_URL}/auth`,
+    LOGIN: `/login`
   },
 
   // Calendars Route
   CALENDARS: {
-    BASE: `${API_BASE}/calendars`,
+    BASE: `${BASE_URL}/calendars`,
   },
 
   // Events Route
   EVENTS: {
-    BASE: `${API_BASE}/events`,
+    BASE: `${BASE_URL}/events`,
     GET: '/',
     CREATE: '/',
     UPDATE: '/:eventId',
@@ -22,7 +25,7 @@ const ROUTES = {
 
   // Search & Filter Route
   SEARCH: {
-    BASE: `${API_BASE}/search`,
+    BASE: `${BASE_URL}/search`,
   },
 };
 

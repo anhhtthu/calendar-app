@@ -1,3 +1,5 @@
-function authenticateToken() {}
+function authenticateToken() {
+    
+}
 
 module.exports = authenticateToken;

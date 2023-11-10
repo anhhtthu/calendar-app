@@ -1,5 +1,5 @@
 const CustomError = require("../utils/customError");
-const logger = require("../utils/logger");
+const { logger } = require("../utils/logger");
 
 function errorHandler(err, req, res, next) {
   // If headers have already been sent, delegate to the default handler

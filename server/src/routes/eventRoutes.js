@@ -1,7 +1,7 @@
 const express = require("express");
 const eventController = require("../controllers/eventController");
 const { authenticateToken } = require("../middleware/authenticateToken");
-const ROUTES = require('../constants/routePaths')
+const ROUTES = require('../constants/routePaths');
 
 const router = express.Router();
 

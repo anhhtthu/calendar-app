@@ -48,6 +48,7 @@ model Event {
   title String
   description String?
   location String?
+  color String @default("#FFFFFF")
   startTime DateTime
   endTime DateTime
   allDay Boolean @default(false)

@@ -1,6 +1,8 @@
 const { createLogger, format, transports } = require("winston");
-require("winston-daily-rotate-file");
 const sprintf = require("sprintf-js").sprintf;
+require("winston-daily-rotate-file");
+
+function initLogger() {}
 
 async function getStackTrace() {
   const stackTrace = await import("stack-trace");
@@ -39,13 +41,19 @@ async function getCallerInfo() {
   const stackTrace = await getStackTrace();
   const trace = stackTrace.get();
 
-  const caller = trace[1];
+  const caller = trace[1] || trace[2];
   if (!caller) {
-    return 'file-unknown:line-unknown';
+    return "file-unknown:line-unknown";
   }
 
-  const file = caller.getFileName();
+  let file = caller.getFileName();
   const line = caller.getLineNumber();
+
+  const nameIndex = file.indexOf('/server/')
+  if (nameIndex !== -1) {
+    file = file.substring(nameIndex)
+  }
+
   return `${file}:${line}`;
 }
 
@@ -53,14 +61,12 @@ logger.infof = async function (message, ...args) {
   const callerInfo = await getCallerInfo();
   const formattedMessage = sprintf(message, ...args);
   this.info(`${callerInfo} - ${formattedMessage}`);
-  // this.info(`${formattedMessage}`);
 };
 
 logger.errorf = async function (message, ...args) {
   const callerInfo = await getCallerInfo();
   const formattedMessage = sprintf(message, ...args);
   this.error(`${callerInfo} - ${formattedMessage}`);
-  // this.error(`${formattedMessage}`);
 };
 
-module.exports = logger;
+module.exports = { initLogger, logger };
