@@ -9,6 +9,16 @@ function responseFormat(req, res, next) {
     res.json(response);
   };
 
+  res.sendError = function (statusCode, errorCode, message, data) {
+    const response = {
+      statusCode,
+      errorCode,
+      message,
+      data
+    }
+    res.status(statusCode).json(response)
+  }
+
   next();
 }
 

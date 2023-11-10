@@ -23,7 +23,7 @@ app.use(responseFormat);
 // });
 
 // app.get("/test-error", (req, res, next) => {
-//     throw new CustomError(123, "Custom error message", 400);
+//     res.sendError(123, "Custom error message", 400);
 // });
 
 app.use(ROUTES.EVENTS.BASE, eventRoutes);

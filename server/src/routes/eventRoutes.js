@@ -1,12 +1,12 @@
 const express = require("express");
 const eventController = require("../controllers/eventController");
-const { authenticateToken } = require("../middleware/authenticateToken");
+const { authenticateToken } = require("../middleware");
 const ROUTES = require('../constants/routePaths');
 
 const router = express.Router();
 
 // Require authenticate JWT
-// router.use(authenticateToken);
+router.use(authenticateToken);
 
 router.get(ROUTES.EVENTS.GET, (req, res, next) => {
     res.sendData({ foo: "bar" }, "Data fetched successfully");
