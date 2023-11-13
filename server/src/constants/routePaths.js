@@ -17,10 +17,20 @@ const ROUTES = {
   // Events Route
   EVENTS: {
     BASE: `${BASE_URL}/events`,
-    GET: '/',
     CREATE: '/',
+    GET: '/',
+    GET_BY_ID: '/:eventId',
     UPDATE: '/:eventId',
     DELETE: '/:eventId',
+  },
+
+  // Recurring Event Route
+  RECURRING_EVENT: {
+    BASE: `${BASE_URL}/events/recurring`,
+    CREATE: '/',
+    GET_BY_ID: '/:eventId',
+    UPDATE: '/:eventId',
+    DELETE: '/:eventId'
   },
 
   // Search & Filter Route

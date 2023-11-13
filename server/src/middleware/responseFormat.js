@@ -1,5 +1,5 @@
 function responseFormat(req, res, next) {
-  res.sendData = function (data, message = "Success") {
+  res.sendData = function (message, data = "Success") {
     const response = {
       statusCode: 200,
       errorCode: 0,

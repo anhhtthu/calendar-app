@@ -10,8 +10,8 @@ function logRequest(req, res, next) {
   }
 
   const bodyLog = body
-    ? JSON.stringify(body).substring(0, 100) +
-      (JSON.stringify(body).length > 100 ? "..." : "")
+    ? JSON.stringify(body).substring(0, 250) +
+      (JSON.stringify(body).length > 250 ? "..." : "")
     : "No Body";
 
   // Log response status and time
