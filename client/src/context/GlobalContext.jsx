@@ -9,6 +9,8 @@ const GlobalContext = React.createContext({
   setSmallCalendarMonth: (index) => {},
   selectedDate: 0,
   setSelectedDate: (index) => {},
+  currentView: "month",
+  setCurrentView: (view) => {},
 });
 
 export default GlobalContext;

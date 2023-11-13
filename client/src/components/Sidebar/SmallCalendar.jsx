@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import dayjs from "dayjs";
 import GlobalContext from "../../context/GlobalContext";
-import { getMonth } from "../../utils";
+import { getMonth, getWeek } from "../../utils";
 import { BsChevronLeft } from "react-icons/bs";
 import { BsChevronRight } from "react-icons/bs";
 
@@ -9,6 +9,8 @@ export default function SmallCalendar() {
   //local state for small calendar
   const [currentMonthSmallCalendarIdx, setCurrentMonthSmallCalendarIdx] =
     useState(dayjs().month());
+  const [currentWeekSmallCalendarIdx, setCurrentWeekSmallCalendarIdx] =
+    useState(dayjs().startOf("week"));
   const [monthSmallCalendar, setMonthSmallCalendar] = useState(getMonth());
   const {
     monthIndex,
@@ -16,11 +18,32 @@ export default function SmallCalendar() {
     setSmallCalendarMonth,
     selectedDate,
     setSelectedDate,
+    weekIndex,
+    setWeekIndex,
+    currentView,
+    smallCalendarMonth,
   } = useContext(GlobalContext);
 
   useEffect(() => {
-    setCurrentMonthSmallCalendarIdx(monthIndex);
-  }, [monthIndex, trigger]);
+    if (currentView === "month") {
+      setCurrentMonthSmallCalendarIdx(monthIndex);
+    } else if (currentView === "week") {
+      setCurrentMonthSmallCalendarIdx(dayjs(weekIndex).month());
+      setCurrentWeekSmallCalendarIdx(weekIndex);
+    }
+  }, [monthIndex, weekIndex, trigger]);
+
+  // useEffect(() => {
+  //   setMonthSmallCalendar(getWeek(currentWeekSmallCalendarIdx));
+  // }, [currentWeekSmallCalendarIdx]);
+
+  // useEffect(() => {
+  //   if (currentView === "week") {
+  //     setMonthSmallCalendar(getWeek(currentWeekSmallCalendarIdx));
+  //   } else if (currentView === "month") {
+  //     setMonthSmallCalendar(getMonth(currentMonthSmallCalendarIdx));
+  //   }
+  // }, [currentMonthSmallCalendarIdx, currentWeekSmallCalendarIdx]);
 
   useEffect(() => {
     setMonthSmallCalendar(getMonth(currentMonthSmallCalendarIdx));
@@ -50,7 +73,13 @@ export default function SmallCalendar() {
 
   function handleSelected() {
     setSmallCalendarMonth(currentMonthSmallCalendarIdx);
+    //set setWeekIndex to have the selected week as small calendar when I click a random day
+    // setWeekIndex(dayjs(currentMonthSmallCalendarIdx).startOf("week"));
   }
+
+  useEffect(() => {
+    console.log(smallCalendarMonth);
+  }, [smallCalendarMonth]);
 
   return (
     <div className="mt-9">

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { BsChevronLeft } from "react-icons/bs";
 import { BsChevronRight } from "react-icons/bs";
 import GlobalContext from "../../context/GlobalContext";
@@ -12,17 +12,38 @@ export default function NavigateButton() {
     setTrigger,
     setWeekIndex,
     weekIndex,
+    currentView,
   } = useContext(GlobalContext);
 
   function handlePrevMonth() {
-    setMonthIndex(monthIndex - 1);
-    setWeekIndex(weekIndex.subtract(1, "week"));
+    if (currentView === "month") {
+      setMonthIndex(monthIndex - 1);
+      setWeekIndex(weekIndex.subtract(1, "month").startOf("week"));
+    } else if (currentView === "week") {
+      let prevWeek = weekIndex.subtract(1, "week");
+      setWeekIndex(prevWeek);
+      if (prevWeek.month() !== weekIndex.month()) {
+        setMonthIndex(monthIndex - 1);
+      }
+    }
   }
 
   function handleNextMonth() {
-    setMonthIndex(monthIndex + 1);
-    setWeekIndex(weekIndex.add(1, "week"));
+    if (currentView === "month") {
+      setMonthIndex(monthIndex + 1);
+      setWeekIndex(weekIndex.add(1, "month").startOf("week"));
+    } else if (currentView === "week") {
+      let nextWeek = weekIndex.add(1, "week");
+      setWeekIndex(nextWeek);
+      if (nextWeek.month() !== weekIndex.month()) {
+        setMonthIndex(monthIndex + 1);
+      }
+    }
   }
+
+  // useEffect(() => {
+  //   console.log(weekIndex);
+  // }, [weekIndex]);
 
   function handleThisMonth() {
     setMonthIndex(dayjs().month());
