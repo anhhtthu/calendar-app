@@ -13,6 +13,7 @@ export default function NavigateButton() {
     setWeekIndex,
     weekIndex,
     currentView,
+    setDirection,
   } = useContext(GlobalContext);
 
   function handlePrevMonth() {
@@ -26,6 +27,7 @@ export default function NavigateButton() {
         setMonthIndex(monthIndex - 1);
       }
     }
+    setDirection(0);
   }
 
   function handleNextMonth() {
@@ -39,11 +41,8 @@ export default function NavigateButton() {
         setMonthIndex(monthIndex + 1);
       }
     }
+    setDirection(1);
   }
-
-  // useEffect(() => {
-  //   console.log(weekIndex);
-  // }, [weekIndex]);
 
   function handleThisMonth() {
     setMonthIndex(dayjs().month());

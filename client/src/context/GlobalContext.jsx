@@ -11,6 +11,12 @@ const GlobalContext = React.createContext({
   setSelectedDate: (index) => {},
   currentView: "month",
   setCurrentView: (view) => {},
+  showModal: false,
+  setShowModal: () => {},
+  dateModal: 0,
+  setDateModal: () => {},
+  direction: 0,
+  setDirection: () => {},
 });
 
 export default GlobalContext;

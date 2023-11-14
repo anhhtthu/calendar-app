@@ -1,8 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext, useState } from "react";
+import { motion } from "framer-motion";
+import { calendarVariants } from "../../animations/calendarVariants";
+import GlobalContext from "../../context/GlobalContext";
 import HourInDayWeek from "./HourInDayWeek";
 import dayjs from "dayjs";
 export default function Week(props) {
   const { week } = { ...props };
+  const { direction, weekIndex } = useContext(GlobalContext);
+  const [isFirstMount, setIsFirstMount] = useState(true);
+
+  useEffect(() => {
+    setIsFirstMount(false);
+  }, []);
 
   function isToday(day) {
     const format = "DD-MM-YYYY";
@@ -19,7 +28,13 @@ export default function Week(props) {
     <React.Fragment>
       <div className=" py-2 w-full justify-center grid grid-cols-[1fr,11fr] bg-gray-200 rounded-lg ">
         <div className="grid grid-cols-1 "></div>
-        <div className="grid grid-cols-7">
+        <motion.div
+          className="grid grid-cols-7"
+          variants={calendarVariants(direction)}
+          animate="visible"
+          initial={isFirstMount ? "visible" : "hidden"}
+          key={weekIndex}
+        >
           {week[0].map((hour, index) => (
             <div
               key={index}
@@ -31,9 +46,15 @@ export default function Week(props) {
               <p className="  text-center">{hour.format("ddd")}</p>
             </div>
           ))}
-        </div>
+        </motion.div>
       </div>
-      <div className="justify-items-center pt-4 grid border mt-5  rounded-lg z-50 grid-cols-[1fr,11fr] h-[87%] overflow-auto scrollbar scrollbar-thumb-gray-200 scrollbar-track-gray-100">
+      <motion.div
+        className="justify-items-center pt-4 grid border mt-5  rounded-lg grid-cols-[1fr,11fr] h-[87%] overflow-auto scrollbar scrollbar-thumb-gray-200 scrollbar-track-gray-100"
+        variants={calendarVariants(direction)}
+        animate="visible"
+        initial={isFirstMount ? "visible" : "hidden"}
+        key={weekIndex}
+      >
         <div className="grid grid-rows-24  ">
           {Array.from({ length: 24 }, (_, index) => (
             <p
@@ -53,7 +74,7 @@ export default function Week(props) {
             </React.Fragment>
           ))}
         </div>
-      </div>
+      </motion.div>
     </React.Fragment>
   );
 }
