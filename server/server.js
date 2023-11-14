@@ -29,6 +29,6 @@ connectDb()
     process.on("SIGTERM", shutdown);
   })
   .catch((error) => {
-    logger.error(error)
+    logger.error(error);
     process.exit(1);
   });

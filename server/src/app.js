@@ -1,6 +1,9 @@
 const express = require("express");
 const { errorHandler, logRequest, bodyParser, cors, responseFormat } = require("./middleware");
 const CustomError = require("./utils/customError");
+const { logger } = require("./utils/logger");
+const CronJob = require("cron").CronJob;
+const sendNotification = require("./services/notificationService");
 
 const ROUTES = require("./constants/routePaths");
 const eventRoutes = require("./routes/eventRoutes");
@@ -14,19 +17,6 @@ app.use(cors);
 app.use(responseFormat);
 
 // Routes
-// app.get("/", (req, res, next) => {
-//     logger.info("GET / route hit");
-//     res.send("Test Calendar App");
-// });
-
-// app.get("/test", (req, res, next) => {
-//     res.sendData({ foo: "bar" }, "Data fetched successfully");
-// });
-
-// app.get("/test-error", (req, res, next) => {
-//     res.sendError(123, "Custom error message", 400);
-// });
-
 app.use(ROUTES.EVENTS.BASE, eventRoutes);
 app.use(ROUTES.RECURRING_EVENT.BASE, recurringEventRoutes);
 
@@ -35,5 +25,19 @@ app.use((req, res, next) => {
   next(new CustomError(404, "Route Not Found", 404));
 });
 app.use(errorHandler);
+
+// Running check and sending notifications job
+logger.info("Before job instantiation");
+const job = new CronJob(
+  "0 */1 * * * *",
+  function () {
+    logger.info("Running the notification check every minute");
+    sendNotification();
+  },
+  null,
+  true,
+);
+logger.info("After job instantiation");
+job.start();
 
 module.exports = app;
