@@ -12,6 +12,7 @@ export default function ContextWrapper({ children }) {
   const [weekIndex, setWeekIndex] = useState(dayjs());
   const [currentView, setCurrentView] = useState("month");
   const [showModal, setShowModal] = useState(false);
+  const [direction, setDirection] = useState(0);
   const location = useLocation();
 
   useEffect(() => {
@@ -54,6 +55,8 @@ export default function ContextWrapper({ children }) {
         setShowModal,
         dateModal,
         setDateModal,
+        setDirection,
+        direction,
       }}
     >
       {children}

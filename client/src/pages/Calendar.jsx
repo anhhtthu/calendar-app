@@ -14,7 +14,7 @@ export default function Calendar() {
       {showModal && <CreateEventModal />}
       <div className="h-screen flex flex-1 ">
         <Sidebar />
-        <div className="h-screen flex flex-1 flex-col">
+        <div className="h-screen flex flex-1 flex-col overflow-x-hidden">
           <Header />
           <Outlet />
         </div>

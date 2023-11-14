@@ -15,6 +15,8 @@ const GlobalContext = React.createContext({
   setShowModal: () => {},
   dateModal: 0,
   setDateModal: () => {},
+  direction: 0,
+  setDirection: () => {},
 });
 
 export default GlobalContext;
