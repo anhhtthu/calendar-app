@@ -41,7 +41,7 @@ async function getCallerInfo() {
   const stackTrace = await getStackTrace();
   const trace = stackTrace.get();
 
-  const caller = trace[1] || trace[2];
+  const caller = trace[1];
   if (!caller) {
     return "file-unknown:line-unknown";
   }

@@ -4,6 +4,7 @@ const CustomError = require("./utils/customError");
 
 const ROUTES = require("./constants/routePaths");
 const eventRoutes = require("./routes/eventRoutes");
+const recurringEventRoutes = require("./routes/recurringEventRoutes");
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(responseFormat);
 // });
 
 app.use(ROUTES.EVENTS.BASE, eventRoutes);
+app.use(ROUTES.RECURRING_EVENT.BASE, recurringEventRoutes);
 
 // Catch all unhandled routes and other errors
 app.use((req, res, next) => {
