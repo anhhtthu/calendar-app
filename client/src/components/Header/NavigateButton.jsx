@@ -41,10 +41,6 @@ export default function NavigateButton() {
     }
   }
 
-  // useEffect(() => {
-  //   console.log(weekIndex);
-  // }, [weekIndex]);
-
   function handleThisMonth() {
     setMonthIndex(dayjs().month());
     setWeekIndex(dayjs().startOf("week"));

@@ -33,7 +33,7 @@ export default function Week(props) {
           ))}
         </div>
       </div>
-      <div className="justify-items-center pt-4 grid border mt-5  rounded-lg z-50 grid-cols-[1fr,11fr] h-[87%] overflow-auto scrollbar scrollbar-thumb-gray-200 scrollbar-track-gray-100">
+      <div className="justify-items-center pt-4 grid border mt-5  rounded-lg grid-cols-[1fr,11fr] h-[87%] overflow-auto scrollbar scrollbar-thumb-gray-200 scrollbar-track-gray-100">
         <div className="grid grid-rows-24  ">
           {Array.from({ length: 24 }, (_, index) => (
             <p
