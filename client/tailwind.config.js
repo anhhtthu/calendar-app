@@ -16,5 +16,17 @@ module.exports = {
       },
     },
   },
+  purge: {
+    options: {
+      safelist: [
+        "bg-indigo-500",
+        "bg-gray-500",
+        "bg-green-500",
+        "bg-blue-500",
+        "bg-rose-500",
+        "bg-purple-500",
+      ],
+    },
+  },
   plugins: [require("@tailwindcss/forms"), require("tailwind-scrollbar")],
 };

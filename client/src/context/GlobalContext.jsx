@@ -17,6 +17,7 @@ const GlobalContext = React.createContext({
   setDateModal: () => {},
   direction: 0,
   setDirection: () => {},
+  dispatchEvent: ({type, payload}) => {},
 });
 
 export default GlobalContext;
