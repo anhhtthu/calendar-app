@@ -1,19 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, Fragment, useEffect } from "react";
 import { Disclosure } from "@headlessui/react";
 import { ChevronUpIcon, PlusIcon } from "@heroicons/react/solid";
 import GlobalContext from "../../context/GlobalContext";
+import { Menu, Transition } from "@headlessui/react";
+import { DotsVerticalIcon } from "@heroicons/react/outline";
 export default function EventType() {
   const [openInput, setOpenInput] = useState(false);
   const [inputEventType, setInputEventType] = useState("");
+  const [updateIndex, setUpdateIndex] = useState(null);
   const { eventTypesDispatch, totalEventTypes } =
     React.useContext(GlobalContext);
 
   //desc: add new event type to eventTypes state
   const handleAddNewEventType = (e) => {
     e.preventDefault();
-    eventTypesDispatch({ type: "ADD_EVENT_TYPE", payload: inputEventType });
+    if (updateIndex !== null) {
+      eventTypesDispatch({
+        type: "UPDATE_EVENT_TYPE",
+        payload: { eventType: inputEventType, index: updateIndex },
+      });
+      setUpdateIndex(null);
+    } else {
+      eventTypesDispatch({ type: "ADD_EVENT_TYPE", payload: inputEventType });
+      setInputEventType("");
+    }
     setInputEventType("");
   };
+
+  const handleRemoveEventType = (eventType) => {
+    eventTypesDispatch({ type: "REMOVE_EVENT_TYPE", payload: eventType });
+  };
+
+  const handleUpdateEventType = (eventType, index) => {
+    setInputEventType(eventType);
+    setOpenInput(true);
+    setUpdateIndex(index);
+  };
+
+  function classNames(...classes) {
+    return classes.filter(Boolean).join(" ");
+  }
 
   return (
     <div className="w-full pt-5 mt-6 border-t-2 border-violet-100">
@@ -41,7 +67,10 @@ export default function EventType() {
               <Disclosure.Panel className="pb-2 pt-4 text-sm text-gray-500">
                 <React.Fragment>
                   {openInput && (
-                    <div className="flex items-center w-full justify-around">
+                    <form
+                      className="flex items-center w-full justify-around"
+                      onSubmit={(e) => handleAddNewEventType(e)}
+                    >
                       <input
                         type="text"
                         value={inputEventType}
@@ -49,25 +78,84 @@ export default function EventType() {
                         onChange={(e) => setInputEventType(e.target.value)}
                         className="p-2 text-gray-500 placeholder:text-gray-400 text-xs w-3/4 border-gray-300 rounded-md"
                       />
-                      <div className="w-1/4 flex justify-center">
-                        <PlusIcon
-                          className=" w-1/2 p-1 text-gray-500 hover:bg-gray-200 rounded-full"
-                          onClick={(e) => handleAddNewEventType(e)}
-                        />
-                      </div>
-                    </div>
+                      <button
+                        className="w-1/4 flex justify-center"
+                        type="submit"
+                      >
+                        <PlusIcon className=" w-1/2 p-1 text-gray-500 hover:bg-gray-200 rounded-full" />
+                      </button>
+                    </form>
                   )}
-                  <div className="mt-5">
+
+                  <div className="mt-5 flex flex-col">
                     {totalEventTypes.eventTypes.map((eventType, index) => (
-                      <div key={index} className="flex items-center pb-3">
-                        <input
-                          type="checkbox"
-                          className="form-checkbox h-4 w-4 rounded-sm border-gray-400 text-violet-500 focus:outline-none focus:ring-0"
-                        />
-                        <label className="ml-2 text-gray-500 font-semibold">
-                          {eventType}
-                        </label>
-                      </div>
+                      <Menu as="div" key={index} className="relative group">
+                        <div className="flex justify-between justify-between items-center py-2 px-1 hover:bg-gray-100">
+                          <div className="flex items-center">
+                            <input
+                              defaultChecked
+                              type="checkbox"
+                              className="inline-block form-checkbox h-4 w-4 rounded-sm border-gray-400 text-violet-500 focus:outline-none focus:ring-0"
+                            />
+                            <label className="inline-block ml-2 text-gray-500  font-semibold ">
+                              {eventType}
+                            </label>
+                          </div>
+                          <Menu.Button>
+                            <DotsVerticalIcon
+                              className="-mr-1 h-5 w-5 text-white mt-1 group-hover:text-gray-400"
+                              aria-hidden="true"
+                            />
+                          </Menu.Button>
+                        </div>
+
+                        <Transition
+                          as={Fragment}
+                          enter="transition ease-out duration-100"
+                          enterFrom="transform opacity-0 scale-95"
+                          enterTo="transform opacity-100 scale-100"
+                          leave="transition ease-in duration-75"
+                          leaveFrom="transform opacity-100 scale-100"
+                          leaveTo="transform opacity-0 scale-95"
+                        >
+                          <Menu.Items className="absolute top-8 right-0 z-10 mt-2 w-1/2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            <Menu.Item>
+                              {({ active }) => (
+                                <button
+                                  onClick={() =>
+                                    handleUpdateEventType(eventType, index)
+                                  }
+                                  className={classNames(
+                                    active
+                                      ? "bg-gray-100 text-gray-600"
+                                      : "text-gray-400",
+                                    "block w-full text-left px-4 py-2"
+                                  )}
+                                >
+                                  Edit
+                                </button>
+                              )}
+                            </Menu.Item>
+                            <Menu.Item key={index}>
+                              {({ active }) => (
+                                <button
+                                  onClick={() =>
+                                    handleRemoveEventType(eventType)
+                                  }
+                                  className={classNames(
+                                    active
+                                      ? "bg-gray-100 text-gray-600"
+                                      : "text-gray-400",
+                                    "block px-4 py-2 w-full text-left"
+                                  )}
+                                >
+                                  Delete
+                                </button>
+                              )}
+                            </Menu.Item>
+                          </Menu.Items>
+                        </Transition>
+                      </Menu>
                     ))}
                   </div>
                 </React.Fragment>

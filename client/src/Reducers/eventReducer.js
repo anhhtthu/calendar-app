@@ -33,6 +33,20 @@ export function eventTypesReducer(totalEventTypes, { type, payload }) {
       return { ...totalEventTypes, newEventType: payload };
     case "SELECTED_EVENT_TYPE":
       return { ...totalEventTypes, selectedEventType: payload };
+    case "UPDATE_EVENT_TYPE":
+      return {
+        ...totalEventTypes,
+        eventTypes: totalEventTypes.eventTypes.map((evt, i) =>
+          i === payload.index ? payload.eventType : evt
+        ),
+      };
+    case "REMOVE_EVENT_TYPE":
+      return {
+        ...totalEventTypes,
+        eventTypes: totalEventTypes.eventTypes.filter(
+          (eventType) => eventType !== payload
+        ),
+      };
     default:
       return totalEventTypes;
   }

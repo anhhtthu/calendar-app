@@ -1,18 +1,12 @@
-import React, {
-  useContext,
-  useEffect,
-  useState,
-  useReducer,
-  Fragment,
-} from "react";
+import React, { useContext, useState, Fragment } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { modalVariants } from "../../animations/modalVariants";
 import { AiOutlineClose } from "react-icons/ai";
 import { BsCheck } from "react-icons/bs";
 import GlobalContext from "../../context/GlobalContext";
-import { eventTypesReducer } from "../../Reducers/eventReducer";
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
+import { saveCalendarEvents } from "../../services/eventServices";
 
 export default function CreateEventModal() {
   const {
@@ -25,7 +19,7 @@ export default function CreateEventModal() {
     eventTypesDispatch,
   } = useContext(GlobalContext);
   const [title, setTitle] = useState("");
-  const [inputEventType, setInputEventType] = useState("");
+  const [description, setDescription] = useState("");
   const currentTime = dateModal.format("HH:mm");
   const currentDate = dateModal.format("YYYY-MM-DD");
   const [chosenTime, setChosenTime] = useState(currentTime);
@@ -38,11 +32,14 @@ export default function CreateEventModal() {
     e.preventDefault();
     const newEvent = {
       title,
+      description,
       date: chosenDate,
       time: chosenTime,
       label: selectedLabel,
       totalEventTypes,
     };
+    saveCalendarEvents([...savedEvents, newEvent]);
+    console.log(newEvent);
     dispatchCalendarEvent({ type: "ADD_EVENT", payload: newEvent });
     setShowModal(false);
   };
@@ -67,7 +64,10 @@ export default function CreateEventModal() {
           animate="visible"
           exit="exit"
         >
-          <form className="w-1/3 bg-white rounded-lg shadow-2xl">
+          <form
+            className="w-1/3 bg-white rounded-lg shadow-2xl"
+            onSubmit={(e) => handleSubmit(e)}
+          >
             <header className="px-4 py-2 mt-3 flex justify-between items-center">
               <div className="flex flex-col items-start">
                 <span className="text-lg font-semibold text-gray-500">
@@ -98,6 +98,8 @@ export default function CreateEventModal() {
                 <div className="flex flex-col gap-2">
                   <label htmlFor="description">Description</label>
                   <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                     placeholder="Event Description"
                     className="border border-gray-300 rounded-md p-2"
                   ></textarea>
@@ -194,8 +196,8 @@ export default function CreateEventModal() {
             </main>
             <footer className="p-4 flex flex-col justify-center">
               <button
+                type="submit"
                 className="flex justify-center items-center gap-1 bg-black text-white rounded-lg p-2"
-                onSubmit={(e) => handleSubmit(e)}
               >
                 <BsCheck className="text-2xl" />
                 <span>Create Schedule</span>
