@@ -1,5 +1,5 @@
 const { logger } = require("../utils/logger");
-const { validateEventInput, createEventForUser, processInvitees, setupEventReminder } = require('../services/eventService');
+const eventService = require('../services/eventService');
 
 exports.createEvent = async (req, res, next) => {
   try {
@@ -8,16 +8,16 @@ exports.createEvent = async (req, res, next) => {
     const eventData = req.body;
 
     // Validate event input
-    validateEventInput(eventData);
+    eventService.validateEventInput(eventData);
 
     // Create event in user's calendar
-    const newEvent = await createEventForUser(userId, eventData);
+    const newEvent = await eventService.createEventForUser(userId, eventData);
 
     // Process invitees
-    await processInvitees(newEvent, eventData.invitees);
+    await eventService.processInvitees(newEvent, eventData.invitees);
 
     // Setup event reminder
-    await setupEventReminder(newEvent, eventData.reminderOption, eventData.customReminderTime, userId);
+    await eventService.setupEventReminder(newEvent, eventData.reminderOption, eventData.customReminderTime, userId);
 
     res.sendData("Event created successfully", newEvent);
   } catch (error) {
@@ -27,10 +27,31 @@ exports.createEvent = async (req, res, next) => {
 };
 
 exports.listEvents = async (req, res, next) => {
-  res.sendData("Data fetched successfully", { foo: "bar" });
+  try {
+    const { timeframe, year, month } = req.query;
+    // const userId = req.user.id;
+    const userId = 2;
+
+    const events = await eventService.listEvents(userId, timeframe, year, month);
+
+    res.sendData("List events retrieved successfully", events);
+  } catch (error) {
+    logger.errorf("Error listing events: %v", error);
+    return res.sendError(error.status, error.errorCode, error.message);
+  }
 };
 
-exports.getEventById = async (req, res, next) => {};
+exports.getEventById = async (req, res, next) => {
+  try {
+    const eventId = parseInt(req.params.id);
+    const event = await eventService.getEventById(eventId);
+
+    res.sendData("Event retrieved successfully", event);
+  } catch (error) {
+    logger.errorf("Error retrieved event: %v", error);
+    return res.sendError(error.status, error.errorCode, error.message);
+  }
+};
 
 exports.updateEvent = async (req, res, next) => {};
 

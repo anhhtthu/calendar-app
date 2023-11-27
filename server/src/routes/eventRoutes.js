@@ -9,8 +9,8 @@ const router = express.Router();
 // router.use(authenticateToken);
 
 router.post(ROUTES.EVENTS.CREATE, eventController.createEvent);
-// router.get(ROUTES.EVENTS.GET, eventController.listEvents);
-// router.get(ROUTES.EVENTS.GET_BY_ID, eventController.getEventById);
+router.get(ROUTES.EVENTS.GET, eventController.listEvents);
+router.get(ROUTES.EVENTS.GET_BY_ID, eventController.getEventById);
 // router.put(ROUTES.EVENTS.UPDATE, eventController.updateEvent);
 // router.delete(ROUTES.EVENTS.DELETE, eventController.deleteEvent);
 
