@@ -11,7 +11,7 @@ const router = express.Router();
 router.post(ROUTES.EVENTS.CREATE, eventController.createEvent);
 router.get(ROUTES.EVENTS.GET, eventController.listEvents);
 router.get(ROUTES.EVENTS.GET_BY_ID, eventController.getEventById);
-// router.put(ROUTES.EVENTS.UPDATE, eventController.updateEvent);
+router.put(ROUTES.EVENTS.UPDATE, eventController.updateEvent);
 // router.delete(ROUTES.EVENTS.DELETE, eventController.deleteEvent);
 
 module.exports = router;

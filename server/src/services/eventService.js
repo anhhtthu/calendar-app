@@ -1,23 +1,14 @@
 const ERROR_CODE = require("../constants/errorCode");
+const EVENT_ENUM = require("../constants/eventEnum");
 const { prisma } = require("../database/client");
 const CustomError = require("../utils/customError");
 const moment = require("moment");
 const { logger } = require("../utils/logger");
+const { calculateReminderTime } = require("./eventServiceHelpers");
 
-exports.validateEventInput = (eventData) => {
-  let { title, startTime, endTime, eventType } = eventData;
-
-  if (!title || !eventType || !startTime || !endTime) {
-    throw new CustomError(400, ERROR_CODE.EVENT_INPUT_REQUIRED, "Missing required fields");
-  }
-
-  if (!moment(startTime, moment.ISO_8601, true).isValid() || !moment(endTime, moment.ISO_8601, true).isValid()) {
-    throw new CustomError(400, ERROR_CODE.EVENT_INPUT_INVALID, "Invalid date format. Use ISO 8601 format.");
-  }
-};
-
-exports.createEventForUser = async (userId, eventData) => {
-  let { calendarId, title, description, location, startTime, endTime, isAllDay, eventType, color } = eventData;
+// CREATE EVENT LOGIC
+exports.createEvent = async (userId, eventData) => {
+  let { calendarId, title, description, location, startTime, endTime, allDay, eventType, color } = eventData;
 
   // retrieve user's calendar
   const calendar = calendarId
@@ -32,7 +23,7 @@ exports.createEventForUser = async (userId, eventData) => {
   endTime = new Date(endTime);
 
   // handle all day events
-  if (isAllDay) {
+  if (allDay) {
     startTime = new Date(startTime.setHours(0, 0, 0, 0));
     endTime = new Date(endTime.setHours(23, 59, 59, 999));
   } else if (startTime >= endTime) {
@@ -47,13 +38,25 @@ exports.createEventForUser = async (userId, eventData) => {
       location,
       startTime: new Date(startTime),
       endTime: new Date(endTime),
-      allDay: isAllDay,
+      allDay: allDay,
       eventType,
       color,
     },
   });
 
   return newEvent;
+};
+
+exports.validateEventInput = (eventData) => {
+  let { title, startTime, endTime, eventType } = eventData;
+
+  if (!title || !eventType || !startTime || !endTime) {
+    throw new CustomError(400, ERROR_CODE.EVENT_INPUT_REQUIRED, "Missing required fields");
+  }
+
+  if (!moment(startTime, moment.ISO_8601, true).isValid() || !moment(endTime, moment.ISO_8601, true).isValid()) {
+    throw new CustomError(400, ERROR_CODE.EVENT_INPUT_INVALID, "Invalid date format. Use ISO 8601 format.");
+  }
 };
 
 exports.processInvitees = async (newEvent, invitees) => {
@@ -84,7 +87,7 @@ exports.processInvitees = async (newEvent, invitees) => {
           location: newEvent.location,
           startTime: new Date(newEvent.startTime),
           endTime: new Date(newEvent.endTime),
-          allDay: newEvent.isAllDay,
+          allDay: newEvent.allDay,
           eventType: newEvent.eventType,
           color: newEvent.color,
         },
@@ -105,7 +108,7 @@ exports.processInvitees = async (newEvent, invitees) => {
           eventId: inviteeEvent.id,
           userId: user.id,
           eventAttendeeId: eventAttendee.id,
-          type: "INVITATION",
+          type: EVENT_ENUM.EVENT_TYPE.INVITATION,
           sendAt: new Date(newEvent.startTime),
         },
       });
@@ -114,53 +117,21 @@ exports.processInvitees = async (newEvent, invitees) => {
 };
 
 exports.setupEventReminder = async (newEvent, reminderOption, customReminderTime, userId) => {
-  let reminderTime;
-
-  if (reminderOption !== undefined && reminderOption !== null) {
-    switch (reminderOption) {
-      case "AT_EVENT_TIME":
-        reminderTime = new Date(newEvent.startTime);
-        break;
-      case "5_MIN_BEFORE":
-        reminderTime = moment(newEvent.startTime)
-          .subtract(5, "minutes")
-          .toDate();
-        break;
-      case "30_MIN_BEFORE":
-        reminderTime = moment(newEvent.startTime)
-          .subtract(30, "minutes")
-          .toDate();
-        break;
-      case "1_HOUR_BEFORE":
-        reminderTime = moment(newEvent.startTime).subtract(1, "hours").toDate();
-        break;
-      case "1_DAY_BEFORE":
-        reminderTime = moment(newEvent.startTime).subtract(1, "days").toDate();
-        break;
-      case "CUSTOM":
-        if (customReminderTime && moment(customReminderTime, moment.ISO_8601, true).isValid()) {
-          reminderTime = new Date(customReminderTime);
-        } else {
-          throw new CustomError(400, ERROR_CODE.EVENT_REMINDER_TIME_INVALID, "Invalid custom reminder time.");
-        }
-        break;
-      default:
-        throw new CustomError(400, ERROR_CODE.EVENT_REMINDER_OPTION_INVALID, "Invalid reminder option.");
-    }
-  }
+  const reminderTime = calculateReminderTime(newEvent.startTime, reminderOption, customReminderTime)
 
   if (reminderTime) {
     await prisma.notification.create({
       data: {
         eventId: newEvent.id,
         userId: userId,
-        type: "REMINDER",
+        type: EVENT_ENUM.EVENT_TYPE.REMINDER,
         sendAt: reminderTime,
       },
     });
   }
 };
 
+// GET EVENT BY ID LOGIC
 exports.getEventById = async (eventId) => {
   const event = await prisma.event.findUnique({
     where: { id: eventId },
@@ -174,6 +145,7 @@ exports.getEventById = async (eventId) => {
   return event;
 };
 
+// GET LIST EVENTS LOGIC
 exports.listEvents = async (userId, timeframe, year, month) => {
   let startDate, endDate;
   const now = moment();
@@ -224,4 +196,82 @@ exports.listEvents = async (userId, timeframe, year, month) => {
   }
 
   return events;
+};
+
+// UPDATE EVENT LOGIC
+exports.updateEvent = async (eventId, newEventData) => {
+  // retrieve the existing event
+  const existingEvent = await prisma.event.findUnique({
+    where: { id: eventId },
+  });
+  if (!existingEvent) {
+    throw new CustomError(404, ERROR_CODE.EVENT_NOT_FOUND, "Event not found");
+  }
+
+  let updateData = {};
+  for (const key in newEventData) {
+    if (newEventData.hasOwnProperty(key)) {
+      updateData[key] = newEventData[key];
+    }
+  }
+
+  // handling for date fields
+  if (updateData.startTime >= updateData.endTime) {
+    throw new CustomError(400, ERROR_CODE.EVENT_TIME_INVALID, "Start time must be before end time.");
+  }
+  if (updateData.startTime) {
+    updateData.startTime = new Date(updateData.startTime);
+  }
+  if (updateData.endTime) {
+    updateData.endTime = new Date(updateData.endTime);
+  }
+
+  const updatedEvent = await prisma.event.update({
+    where: { id: eventId },
+    data: updateData,
+  });
+
+  return updatedEvent;
+};
+
+exports.updateEventReminder = async (eventId, newEventData, userId) => {
+  if ('reminderOption' in newEventData) {
+    if (newEventData.reminderOption === EVENT_ENUM.REMINDER.NONE) {
+      // delete existing reminder
+      await prisma.notification.deleteMany({
+        where: { eventId: eventId, type: EVENT_ENUM.EVENT_TYPE.REMINDER }
+      });
+    } else {
+      const existingReminder = await prisma.notification.findFirst({
+        where: { eventId: eventId, type: EVENT_ENUM.EVENT_TYPE.REMINDER }
+      });
+
+      const reminderTime = calculateReminderTime(newEventData.startTime, newEventData.reminderOption, newEventData.customReminderTime)
+
+      if (existingReminder) {
+        return await prisma.notification.update({
+          where: { id: existingReminder.id },
+          data: { sendAt: reminderTime, sent: false },
+        });
+      }
+
+      return await prisma.notification.create({
+        data: {
+          eventId: eventId,
+          userId: userId,
+          type: EVENT_ENUM.EVENT_TYPE.REMINDER,
+          sendAt: reminderTime,
+        },
+      });
+    }
+  }
+};
+
+exports.updateInvitees = async (eventId, newInvitees) => {
+  
+};
+
+// DELETE EVENT LOGIC
+exports.deleteEvent = async (eventId) => {
+
 };

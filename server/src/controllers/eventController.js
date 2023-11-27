@@ -3,7 +3,7 @@ const eventService = require('../services/eventService');
 
 exports.createEvent = async (req, res, next) => {
   try {
-    const userId = 2;
+    const userId = 3;
     // const userId = req.user.id;
     const eventData = req.body;
 
@@ -11,7 +11,7 @@ exports.createEvent = async (req, res, next) => {
     eventService.validateEventInput(eventData);
 
     // Create event in user's calendar
-    const newEvent = await eventService.createEventForUser(userId, eventData);
+    const newEvent = await eventService.createEvent(userId, eventData);
 
     // Process invitees
     await eventService.processInvitees(newEvent, eventData.invitees);
@@ -43,7 +43,7 @@ exports.listEvents = async (req, res, next) => {
 
 exports.getEventById = async (req, res, next) => {
   try {
-    const eventId = parseInt(req.params.id);
+    const eventId = parseInt(req.params.eventId);
     const event = await eventService.getEventById(eventId);
 
     res.sendData("Event retrieved successfully", event);
@@ -53,6 +53,31 @@ exports.getEventById = async (req, res, next) => {
   }
 };
 
-exports.updateEvent = async (req, res, next) => {};
+exports.updateEvent = async (req, res, next) => {
+  try {
+    const eventId = parseInt(req.params.eventId);
+    const eventData = req.body;
 
-exports.deleteEvent = async (req, res, next) => {};
+    // eventService.validateEventInput(eventData);
+
+    const updatedEvent = await eventService.updateEvent(eventId, eventData);
+
+    res.sendData("Event updated successfully", updatedEvent);
+  } catch (error) {
+    logger.errorf("Error updating event: %v", error);
+    return res.sendError(error.status, error.errorCode, error.message);
+  }
+};
+
+exports.deleteEvent = async (req, res, next) => {
+  try {
+    const eventId = req.params.eventId;
+
+    await eventService.deleteEvent(eventId);
+
+    res.sendData("Event deleted successfully");
+  } catch (error) {
+    logger.errorf("Error deleting event: %v", error);
+    return res.sendError(error.status, error.errorCode, error.message);
+  }
+};
