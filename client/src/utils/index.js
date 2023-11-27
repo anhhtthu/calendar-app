@@ -15,7 +15,7 @@ export function getMonth(month = dayjs().month()) {
 
 export function getWeek(day = dayjs()) {
   const startOfWeek = day.startOf("week");
-  let generateHour = 0;
+  let generateHour = -1;
   const generateWeekHoursMatrix = new Array(24).fill(null).map(() => {
     generateHour++;
     return new Array(7).fill(null).map((dayOffSet, index) => {
@@ -26,4 +26,14 @@ export function getWeek(day = dayjs()) {
     });
   });
   return generateWeekHoursMatrix;
+}
+
+export function getDay(day = dayjs()) {
+  const year = day.year();
+  const month = day.month();
+  const date = day.date();
+  const generateDayHoursMatrix = new Array(24).fill(null).map((_, hour) => {
+    return dayjs(new Date(year, month, date, hour));
+  });
+  return generateDayHoursMatrix;
 }

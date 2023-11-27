@@ -6,7 +6,11 @@ import {
   savedEventsReducer,
   eventTypesReducer,
 } from "../Reducers/eventReducer";
-import { fetchEvents, saveCalendarEvents } from "../services/eventServices";
+import {
+  fetchEvents,
+  saveCalendarEvents,
+  getEvents,
+} from "../services/eventServices";
 
 export default function ContextWrapper({ children }) {
   const [monthIndex, setMonthIndex] = useState(dayjs().month());
@@ -15,6 +19,7 @@ export default function ContextWrapper({ children }) {
   const [selectedDate, setSelectedDate] = useState(0);
   const [dateModal, setDateModal] = useState(dayjs());
   const [weekIndex, setWeekIndex] = useState(dayjs());
+  const [dayIndex, setDayIndex] = useState(dayjs());
   const [currentView, setCurrentView] = useState("month");
   const [showModal, setShowModal] = useState(false);
   const [direction, setDirection] = useState(0);
@@ -78,12 +83,15 @@ export default function ContextWrapper({ children }) {
 
   //fetch events from database and initialize savedEvents state
   useEffect(() => {
-    const fetching = async () => {
+    const fetchEvents = async () => {
       try {
-        const events = await fetchEvents();
+        const events = await getEvents();
         console.log(events);
         if (events.length > 0) {
-          dispatchCalendarEvent({ type: "INITIAL_EVENT", payload: events });
+          dispatchCalendarEvent({
+            type: "INITIAL_EVENT",
+            payload: events,
+          });
         }
         setLoading(false);
       } catch (error) {
@@ -91,7 +99,7 @@ export default function ContextWrapper({ children }) {
         setLoading(false);
       }
     };
-    fetching();
+    fetchEvents();
   }, []);
 
   //purpose: render the loading screen until the todos are fetched from the database
@@ -129,6 +137,8 @@ export default function ContextWrapper({ children }) {
         eventTypesDispatch,
         isWarning,
         setIsWarning,
+        dayIndex,
+        setDayIndex,
       }}
     >
       {children}

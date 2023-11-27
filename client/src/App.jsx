@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Calendar from "./pages/Calendar";
 import MonthViewCalendar from "./pages/MonthViewCalendar";
 import WeekViewCalendar from "./pages/WeekViewCalendar";
+import DayViewCalendar from "./pages/DayViewCalendar";
 import React from "react";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route index element={<Navigate to="monthview" replace />} />
         <Route path="monthview" element={<MonthViewCalendar />} />
         <Route path="weekview" element={<WeekViewCalendar />} />
+        <Route path="dayview" element={<DayViewCalendar />} />
       </Route>
     </Routes>
   );

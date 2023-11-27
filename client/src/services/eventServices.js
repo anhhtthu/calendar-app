@@ -1,3 +1,5 @@
+import { ROUTES } from "../constant/apiPath";
+
 // Purpose: To provide functions for fetching and saving events to local storage
 export function fetchEvents() {
   try {
@@ -7,6 +9,39 @@ export function fetchEvents() {
   } catch {
     console.log("Failed to fetch events");
     return [];
+  }
+}
+
+const handleErrors = (error) => {
+  if (error.response) {
+    console.log(error.response);
+  } else if (error.request) {
+    console.log(error.request);
+  } else {
+    console.log("Error", error.message);
+  }
+  throw error;
+};
+
+export async function createEvent(event) {
+  try {
+    const response = await fetch(ROUTES.EVENTS.BASE.CREATE, event, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    handleErrors(error);
+  }
+}
+
+export async function getEvents() {
+  try {
+    const response = await fetch(ROUTES.EVENTS.BASE.GET, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    handleErrors(error);
   }
 }
 

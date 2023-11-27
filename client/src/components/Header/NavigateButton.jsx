@@ -2,9 +2,11 @@ import React, { useContext, useEffect } from "react";
 import { BsChevronLeft } from "react-icons/bs";
 import { BsChevronRight } from "react-icons/bs";
 import GlobalContext from "../../context/GlobalContext";
+import weekOfYear from "dayjs/plugin/weekOfYear";
 import dayjs from "dayjs";
 
 export default function NavigateButton() {
+  dayjs.extend(weekOfYear);
   const {
     monthIndex,
     setMonthIndex,
@@ -12,6 +14,8 @@ export default function NavigateButton() {
     setTrigger,
     setWeekIndex,
     weekIndex,
+    dayIndex,
+    setDayIndex,
     currentView,
     setDirection,
   } = useContext(GlobalContext);
@@ -25,6 +29,14 @@ export default function NavigateButton() {
       setWeekIndex(prevWeek);
       if (prevWeek.month() !== weekIndex.month()) {
         setMonthIndex(monthIndex - 1);
+      }
+    } else if (currentView === "day") {
+      let prevDay = dayIndex.subtract(1, "day");
+      setDayIndex(prevDay);
+      if (prevDay.month() !== dayIndex.month()) {
+        setMonthIndex(monthIndex - 1);
+      } else if (prevDay.week() !== dayIndex.week()) {
+        setWeekIndex(weekIndex.subtract(1, "week"));
       }
     }
     setDirection(0);
@@ -40,6 +52,14 @@ export default function NavigateButton() {
       if (nextWeek.month() !== weekIndex.month()) {
         setMonthIndex(monthIndex + 1);
       }
+    } else if (currentView === "day") {
+      let nextDay = dayIndex.add(1, "day");
+      setDayIndex(nextDay);
+      if (dayIndex.month() !== nextDay.month()) {
+        setMonthIndex(monthIndex + 1);
+      } else if (dayIndex.week() !== nextDay.week()) {
+        setWeekIndex(weekIndex.add(1, "week"));
+      }
     }
     setDirection(1);
   }
@@ -48,6 +68,7 @@ export default function NavigateButton() {
     setMonthIndex(dayjs().month());
     setWeekIndex(dayjs().startOf("week"));
     setTrigger(!trigger);
+    setDayIndex(dayjs());
   }
 
   return (
