@@ -1,8 +1,13 @@
 // Purpose: To provide functions for fetching and saving events to local storage
 export function fetchEvents() {
-  const events = localStorage.getItem("savedEvents");
-  const parsedEvents = events ? JSON.parse(events) : [];
-  return parsedEvents;
+  try {
+    const events = localStorage.getItem("savedEvents");
+    const parsedEvents = events ? JSON.parse(events) : [];
+    return parsedEvents;
+  } catch {
+    console.log("Failed to fetch events");
+    return [];
+  }
 }
 
 //Purpose: To fetch events from server

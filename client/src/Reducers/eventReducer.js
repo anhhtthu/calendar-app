@@ -19,6 +19,8 @@ export function savedEventsReducer(state, { type, payload }) {
 //purpose: to manage the state of event types
 export function eventTypesReducer(totalEventTypes, { type, payload }) {
   switch (type) {
+    case "INITIAL_EVENT_TYPE":
+      return payload;
     case "ADD_EVENT_TYPE":
       if (totalEventTypes.eventTypes.length < 5) {
         return {

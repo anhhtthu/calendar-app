@@ -8,7 +8,7 @@ export default function EventType() {
   const [openInput, setOpenInput] = useState(false);
   const [inputEventType, setInputEventType] = useState("");
   const [updateIndex, setUpdateIndex] = useState(null);
-  const { eventTypesDispatch, totalEventTypes } =
+  const { eventTypesDispatch, totalEventTypes, savedEvent } =
     React.useContext(GlobalContext);
 
   //desc: add new event type to eventTypes state
@@ -27,16 +27,19 @@ export default function EventType() {
     setInputEventType("");
   };
 
+  //desc: remove event type from eventTypes state
   const handleRemoveEventType = (eventType) => {
     eventTypesDispatch({ type: "REMOVE_EVENT_TYPE", payload: eventType });
   };
 
+  //desc: update event type from eventTypes state
   const handleUpdateEventType = (eventType, index) => {
     setInputEventType(eventType);
     setOpenInput(true);
     setUpdateIndex(index);
   };
 
+  //desc: merge multiple classes into one if the option is active
   function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
   }
@@ -50,12 +53,12 @@ export default function EventType() {
               <Disclosure.Button className="px-4 flex w-full items-center justify-between rounded-lg py-2 text-left text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75">
                 <span>Filter Events</span>
                 <div className="flex items-center gap-3">
-                  {!openInput && (
+                  {/* {!openInput && (
                     <PlusIcon
                       className="h-6 w-6 p-1 text-gray-500 hover:bg-gray-200 rounded-full"
                       onClick={() => setOpenInput(true)}
                     />
-                  )}
+                  )} */}
                   <ChevronUpIcon
                     className={`${
                       open ? "rotate-180 transform" : ""
@@ -66,26 +69,21 @@ export default function EventType() {
 
               <Disclosure.Panel className="pb-2 pt-4 text-sm text-gray-500">
                 <React.Fragment>
-                  {openInput && (
-                    <form
-                      className="flex items-center w-full justify-around"
-                      onSubmit={(e) => handleAddNewEventType(e)}
-                    >
-                      <input
-                        type="text"
-                        value={inputEventType}
-                        placeholder="Add new event type"
-                        onChange={(e) => setInputEventType(e.target.value)}
-                        className="p-2 text-gray-500 placeholder:text-gray-400 text-xs w-3/4 border-gray-300 rounded-md"
-                      />
-                      <button
-                        className="w-1/4 flex justify-center"
-                        type="submit"
-                      >
-                        <PlusIcon className=" w-1/2 p-1 text-gray-500 hover:bg-gray-200 rounded-full" />
-                      </button>
-                    </form>
-                  )}
+                  <form
+                    className="flex items-center w-full justify-around"
+                    onSubmit={(e) => handleAddNewEventType(e)}
+                  >
+                    <input
+                      type="text"
+                      value={inputEventType}
+                      placeholder="Add new event type"
+                      onChange={(e) => setInputEventType(e.target.value)}
+                      className="p-2 text-gray-500 placeholder:text-gray-400 text-xs w-3/4 border-gray-300 rounded-md"
+                    />
+                    <button className="w-1/4 flex justify-center" type="submit">
+                      <PlusIcon className=" w-1/2 p-1 text-gray-500 hover:bg-gray-200 rounded-full" />
+                    </button>
+                  </form>
 
                   <div className="mt-5 flex flex-col">
                     {totalEventTypes.eventTypes.map((eventType, index) => (

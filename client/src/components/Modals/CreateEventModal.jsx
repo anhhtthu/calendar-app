@@ -1,4 +1,4 @@
-import React, { useContext, useState, Fragment } from "react";
+import React, { useContext, useState, Fragment, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { modalVariants } from "../../animations/modalVariants";
 import { AiOutlineClose } from "react-icons/ai";
@@ -17,6 +17,8 @@ export default function CreateEventModal() {
     dispatchCalendarEvent,
     totalEventTypes,
     eventTypesDispatch,
+    setIsWarning,
+    isWarning,
   } = useContext(GlobalContext);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -77,7 +79,7 @@ export default function CreateEventModal() {
                   You can create event, meeting and tasks
                 </span>
               </div>
-              <button onClick={() => setShowModal(false)}>
+              <button type="button" onClick={() => setIsWarning(true)}>
                 <AiOutlineClose className="text-gray-400 text-xl" />
               </button>
             </header>

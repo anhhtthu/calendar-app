@@ -18,6 +18,8 @@ export default function ContextWrapper({ children }) {
   const [currentView, setCurrentView] = useState("month");
   const [showModal, setShowModal] = useState(false);
   const [direction, setDirection] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [isWarning, setIsWarning] = useState(false);
   const location = useLocation();
 
   //initialize savedEvents state
@@ -37,12 +39,6 @@ export default function ContextWrapper({ children }) {
     eventTypesReducer,
     initialEventTypes
   );
-
-  //fetch events from database and initialize savedEvents state
-  useEffect(() => {
-    const initialEvents = fetchEvents();
-    dispatchCalendarEvent({ type: "INITIAL_EVENT", payload: initialEvents });
-  }, []);
 
   //update savedEvents state when savedEvents is updated
   useEffect(() => {
@@ -70,6 +66,43 @@ export default function ContextWrapper({ children }) {
     }
   }, [location]);
 
+  //initialize eventTypes state when savedEvents is updated
+  useEffect(() => {
+    if (savedEvents && savedEvents.length > 0) {
+      eventTypesDispatch({
+        type: "INITIAL_EVENT_TYPE",
+        payload: savedEvents.totalEventTypes,
+      });
+    }
+  }, [savedEvents]);
+
+  //fetch events from database and initialize savedEvents state
+  useEffect(() => {
+    const fetching = async () => {
+      try {
+        const events = await fetchEvents();
+        console.log(events);
+        if (events.length > 0) {
+          dispatchCalendarEvent({ type: "INITIAL_EVENT", payload: events });
+        }
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
+    };
+    fetching();
+  }, []);
+
+  //purpose: render the loading screen until the todos are fetched from the database
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
+
   return (
     <GlobalContext.Provider
       value={{
@@ -94,6 +127,8 @@ export default function ContextWrapper({ children }) {
         savedEvents,
         totalEventTypes,
         eventTypesDispatch,
+        isWarning,
+        setIsWarning,
       }}
     >
       {children}
