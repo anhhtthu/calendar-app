@@ -1,7 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useReducer } from "react";
 import GlobalContext from "./GlobalContext";
 import dayjs from "dayjs";
 import { useLocation } from "react-router-dom";
+import {
+  savedEventsReducer,
+  eventTypesReducer,
+} from "../Reducers/eventReducer";
+import { fetchEvents, saveCalendarEvents } from "../services/eventServices";
 
 export default function ContextWrapper({ children }) {
   const [monthIndex, setMonthIndex] = useState(dayjs().month());
@@ -15,6 +20,36 @@ export default function ContextWrapper({ children }) {
   const [direction, setDirection] = useState(0);
   const location = useLocation();
 
+  //initialize savedEvents state
+  const [savedEvents, dispatchCalendarEvent] = useReducer(
+    savedEventsReducer,
+    []
+  );
+
+  //create initial value for event type, in case user data is empty
+  const initialEventTypes = {
+    eventTypes: [],
+    selectedEventType: null,
+  };
+
+  //initialize eventTypes state
+  const [totalEventTypes, eventTypesDispatch] = useReducer(
+    eventTypesReducer,
+    initialEventTypes
+  );
+
+  //fetch events from database and initialize savedEvents state
+  useEffect(() => {
+    const initialEvents = fetchEvents();
+    dispatchCalendarEvent({ type: "INITIAL_EVENT", payload: initialEvents });
+  }, []);
+
+  //update savedEvents state when savedEvents is updated
+  useEffect(() => {
+    saveCalendarEvents(savedEvents);
+  }, [savedEvents]);
+
+  //set monthIndex to smallCalendarMonth when smallCalendarMonth is updated
   useEffect(() => {
     if (smallCalendarMonth !== null) {
       setMonthIndex(smallCalendarMonth);
@@ -22,6 +57,7 @@ export default function ContextWrapper({ children }) {
     }
   }, [smallCalendarMonth]);
 
+  //define current view of calendar to toggle next/prev buttons
   useEffect(() => {
     if (location.pathname === "/calendar/weekview") {
       setCurrentView("week");
@@ -34,9 +70,6 @@ export default function ContextWrapper({ children }) {
     }
   }, [location]);
 
-  useEffect(() => {
-    console.log(currentView);
-  }, [currentView]);
   return (
     <GlobalContext.Provider
       value={{
@@ -57,6 +90,10 @@ export default function ContextWrapper({ children }) {
         setDateModal,
         setDirection,
         direction,
+        dispatchCalendarEvent,
+        savedEvents,
+        totalEventTypes,
+        eventTypesDispatch,
       }}
     >
       {children}
