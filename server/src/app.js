@@ -27,17 +27,17 @@ app.use((req, res, next) => {
 app.use(errorHandler);
 
 // Running check and sending notifications job
-logger.info("Before job instantiation");
-const job = new CronJob(
-  "0 */1 * * * *",
-  function () {
-    logger.info("Running the notification check every minute");
-    sendNotification();
-  },
-  null,
-  true,
-);
-logger.info("After job instantiation");
-job.start();
+// logger.info("Before job instantiation");
+// const job = new CronJob(
+//   "0 */1 * * * *",
+//   function () {
+//     logger.info("Running the notification check every minute");
+//     sendNotification();
+//   },
+//   null,
+//   true,
+// );
+// logger.info("After job instantiation");
+// job.start();
 
 module.exports = app;

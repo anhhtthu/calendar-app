@@ -1,4 +1,9 @@
 {
   "gitlens.views.contributors.showAllBranches": true,
-  "cSpell.words": ["craco", "tailwindcss", "webfonts"]
+  "cSpell.words": [
+    "craco",
+    "tailwindcss",
+    "timeframe",
+    "webfonts"
+  ]
 }
