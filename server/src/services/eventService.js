@@ -1,5 +1,6 @@
 const ERROR_CODE = require("../constants/errorCode");
 const { prisma } = require("../database/client");
+const moment = require("moment");
 const CustomError = require("../utils/customError");
 const {
   updateEventReminder,
@@ -96,38 +97,30 @@ exports.getEventById = async (userId, eventId) => {
 };
 
 // GET LIST EVENTS LOGIC
-// exports.listEvents = async (userId, timeframe, year, month) => {
-//   const { startDate, endDate } = calculateTimeframeDates(
-//     timeframe,
-//     year,
-//     month
-//   );
+exports.listEvents = async (
+  userId,
+  timeframe,
+  year,
+  month,
+  customStartTime,
+  customEndTime
+) => {
+  let startDate, endDate;
 
-//   const events = await prisma.event.findMany({
-//     where: {
-//       calendar: {
-//         user: {
-//           id: userId,
-//         },
-//       },
-//       startTime: { gte: startDate.toDate() },
-//       endTime: { lte: endDate.toDate() },
-//     },
-//     orderBy: { startTime: "asc" },
-//   });
-
-//   if (events.length === 0) {
-//     throw new CustomError(404, ERROR_CODE.EVENT_NOT_FOUND, "No events found");
-//   }
-
-//   return events;
-// };
-exports.listEvents = async (userId, timeframe, year, month) => {
-  const { startDate, endDate } = calculateTimeframeDates(
-    timeframe,
-    year,
-    month
-  );
+  if (customStartTime && customEndTime) {
+    startDate = moment(customStartTime);
+    endDate = moment(customEndTime);
+  } else if (timeframe) {
+    const calculatedDates = calculateTimeframeDates(timeframe, year, month);
+    startDate = calculatedDates.startDate;
+    endDate = calculatedDates.endDate;
+  } else {
+    throw new CustomError(
+      400,
+      ERROR_CODE.EVENT_INPUT_INVALID,
+      "Either timeframe or custom start and end times must be provided."
+    );
+  }
 
   const events = await prisma.event.findMany({
     where: {
@@ -198,13 +191,13 @@ exports.updateEvent = async (eventId, newEventData, userId) => {
   });
 
   // detect changes that require attendee notification
-  const shouldNotifyAttendees =
-    updateData.startTime !== existingEvent.startTime ||
-    updateData.endTime !== existingEvent.endTime;
+  // const shouldNotifyAttendees =
+  //   updateData.startTime !== existingEvent.startTime ||
+  //   updateData.endTime !== existingEvent.endTime;
 
-  if (shouldNotifyAttendees) {
-    await notifyAttendeesOfUpdates(eventId, existingEvent.eventAttendees);
-  }
+  // if (shouldNotifyAttendees) {
+  //   await notifyAttendeesOfUpdates(eventId, existingEvent.eventAttendees);
+  // }
 
   // update reminders if necessary
   if (
@@ -223,4 +216,23 @@ exports.updateEvent = async (eventId, newEventData, userId) => {
 };
 
 // DELETE EVENT LOGIC
-exports.deleteEvent = async (eventId) => {};
+exports.deleteEvent = async (eventId, userId) => {
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: { calendar: true },
+  });
+
+  if (!event) {
+    throw new CustomError(404, ERROR_CODE.EVENT_NOT_FOUND, "Event not found");
+  }
+
+  if (event.calendar.userId !== userId) {
+    throw new CustomError(
+      403,
+      ERROR_CODE.EVENT_UNAUTHORIZE,
+      "Unauthorized to delete this event"
+    );
+  }
+
+  await prisma.event.delete({ where: { id: eventId } });
+};

@@ -191,39 +191,43 @@ exports.processInvitees = async (newEvent, invitees) => {
 };
 
 exports.updateEventReminder = async (eventId, newEventData, userId) => {
-  if ("reminderOption" in newEventData) {
-    if (newEventData.reminderOption === EVENT_ENUM.REMINDER.NONE) {
-      // delete existing reminder
-      await prisma.notification.deleteMany({
-        where: { eventId: eventId, type: EVENT_ENUM.EVENT_NOTIFY.REMINDER },
-      });
-    } else {
-      const existingReminder = await prisma.notification.findFirst({
-        where: { eventId: eventId, type: EVENT_ENUM.EVENT_NOTIFY.REMINDER },
-      });
+  const reminderOption = newEventData.reminderOption;
 
-      const reminderTime = calculateReminderTime(
-        newEventData.startTime,
-        newEventData.reminderOption,
-        newEventData.customReminderTime
-      );
+  // handle no reminder case
+  if (reminderOption === EVENT_ENUM.REMINDER.NONE) {
+    await prisma.notification.deleteMany({
+      where: { eventId: eventId, type: EVENT_ENUM.EVENT_NOTIFY.REMINDER },
+    });
+    return;
+  }
 
-      if (existingReminder) {
-        return await prisma.notification.update({
-          where: { id: existingReminder.id },
-          data: { sendAt: reminderTime, sent: false },
-        });
-      }
+  const reminderTime = calculateReminderTime(
+    newEventData.startTime,
+    reminderOption,
+    newEventData.customReminderTime
+  );
 
-      return await prisma.notification.create({
-        data: {
-          eventId: eventId,
-          userId: userId,
-          type: EVENT_ENUM.EVENT_NOTIFY.REMINDER,
-          sendAt: reminderTime,
-        },
+  // check if an existing reminder needs to be updated or a new one created
+  const existingReminder = await prisma.notification.findFirst({
+    where: { eventId: eventId, type: EVENT_ENUM.EVENT_NOTIFY.REMINDER },
+  });
+
+  if (existingReminder) {
+    if (existingReminder.sendAt.getTime() !== reminderTime.getTime()) {
+      await prisma.notification.update({
+        where: { id: existingReminder.id },
+        data: { sendAt: reminderTime, sent: false },
       });
     }
+  } else {
+    await prisma.notification.create({
+      data: {
+        eventId: eventId,
+        userId: userId,
+        type: EVENT_ENUM.EVENT_NOTIFY.REMINDER,
+        sendAt: reminderTime,
+      },
+    });
   }
 };
 
@@ -231,41 +235,27 @@ exports.updateInvitees = async (eventId, newInvitees, originalEventData) => {
   const existingInviteeEvents = await prisma.eventAttendee.findMany({
     where: { eventId: eventId },
     include: {
-      user: true,
-      event: true,
+      attendee: true,
     },
   });
 
-  // map to get email / userName to event mapping for existing invitees
-  const existingInviteeEmails = new Set();
-  const inviteeEventMap = {};
-  existingInviteeEvents.forEach((inviteeEvent) => {
-    let user = inviteeEvent.user.email;
-    if (inviteeEvent.user.userName) {
-      user = inviteeEvent.user.userName;
-    }
-
-    existingInviteeEmails.add(user);
-    inviteeEventMap[user] = inviteeEvent.event.id;
-  });
-
-  // identify new and removed invitees
-  const newInvites = newInvitees.filter(
-    (invitee) => !existingInviteeEmails.has(invitee)
+  const inviteeMap = new Map(
+    existingInviteeEvents.map((ie) => [
+      ie.attendee.email || ie.attendee.userName,
+      ie,
+    ])
   );
+
+  const newInvites = newInvitees.filter((invitee) => !inviteeMap.has(invitee));
   const removedInvites = existingInviteeEvents.filter(
-    (inviteeEvent) => !newInvitees.includes(inviteeEvent.user.email)
+    (ie) => !newInvitees.includes(ie.attendee.email || ie.attendee.userName)
   );
 
   // process new invitations
-  for (const newInvite of newInvites) {
-    await this.processInvitees(originalEventData, newInvite);
-  }
+  await this.processInvitees(originalEventData, newInvites);
 
-  // handle removed invitations
+  // process removed invitations
   for (const inviteeEvent of removedInvites) {
-    const inviteeEventId = inviteeEventMap[inviteeEvent.user.email];
-    await prisma.event.delete({ where: { id: inviteeEventId } });
     await prisma.eventAttendee.delete({ where: { id: inviteeEvent.id } });
   }
 };

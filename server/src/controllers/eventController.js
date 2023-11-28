@@ -38,15 +38,18 @@ exports.createEvent = async (req, res, next) => {
 
 exports.listEvents = async (req, res, next) => {
   try {
-    const { timeframe, year, month } = req.query;
-    const userId = req.user.id;
-    // const userId = 2;
+    const { timeframe, year, month, customStartTime, customEndTime } =
+      req.query;
+    // const userId = req.user.id;
+    const userId = 3;
 
     const events = await eventService.listEvents(
       userId,
       timeframe,
       year,
-      month
+      month,
+      customStartTime,
+      customEndTime
     );
 
     res.sendData("List events retrieved successfully", events);
@@ -75,8 +78,8 @@ exports.updateEvent = async (req, res, next) => {
   try {
     const eventId = parseInt(req.params.eventId);
     const eventData = req.body;
-    const userId = req.user.id;
-    // const userId = 2;
+    // const userId = req.user.id;
+    const userId = 2;
 
     // validateEventInput(eventData);
 
@@ -95,9 +98,11 @@ exports.updateEvent = async (req, res, next) => {
 
 exports.deleteEvent = async (req, res, next) => {
   try {
-    const eventId = req.params.eventId;
+    const eventId = parseInt(req.params.eventId);
+    // const userId = req.user.id;
+    const userId = 2;
 
-    await eventService.deleteEvent(eventId);
+    await eventService.deleteEvent(eventId, userId);
 
     res.sendData("Event deleted successfully");
   } catch (error) {
