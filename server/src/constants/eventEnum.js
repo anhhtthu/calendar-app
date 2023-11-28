@@ -8,9 +8,14 @@ const EVENT_ENUM = {
         "CUSTOM": "CUSTOM",
         "NONE": "NONE",
     },
-    EVENT_TYPE: {
+    EVENT_NOTIFY: {
         INVITATION: "INVITATION",
         REMINDER: "REMINDER"
+    },
+    INVITATION_STATUS: {
+        INVITED: "INVITED",
+        ACCEPTED: "ACCEPTED",
+        DECLINED: "DECLINED"
     },
 }
 

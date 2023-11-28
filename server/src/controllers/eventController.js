@@ -1,23 +1,33 @@
 const { logger } = require("../utils/logger");
-const eventService = require('../services/eventService');
+const eventService = require("../services/eventService");
+const {
+  validateEventInput,
+  setupEventReminder,
+  processInvitees,
+} = require("../services/eventServiceHelpers");
 
 exports.createEvent = async (req, res, next) => {
   try {
-    const userId = 3;
-    // const userId = req.user.id;
+    // const userId = 2;
+    const userId = req.user.id;
     const eventData = req.body;
 
     // Validate event input
-    eventService.validateEventInput(eventData);
+    validateEventInput(eventData);
 
     // Create event in user's calendar
     const newEvent = await eventService.createEvent(userId, eventData);
 
     // Process invitees
-    await eventService.processInvitees(newEvent, eventData.invitees);
+    await processInvitees(newEvent, eventData.invitees);
 
     // Setup event reminder
-    await eventService.setupEventReminder(newEvent, eventData.reminderOption, eventData.customReminderTime, userId);
+    await setupEventReminder(
+      newEvent,
+      eventData.reminderOption,
+      eventData.customReminderTime,
+      userId
+    );
 
     res.sendData("Event created successfully", newEvent);
   } catch (error) {
@@ -29,10 +39,15 @@ exports.createEvent = async (req, res, next) => {
 exports.listEvents = async (req, res, next) => {
   try {
     const { timeframe, year, month } = req.query;
-    // const userId = req.user.id;
-    const userId = 2;
+    const userId = req.user.id;
+    // const userId = 2;
 
-    const events = await eventService.listEvents(userId, timeframe, year, month);
+    const events = await eventService.listEvents(
+      userId,
+      timeframe,
+      year,
+      month
+    );
 
     res.sendData("List events retrieved successfully", events);
   } catch (error) {
@@ -44,7 +59,10 @@ exports.listEvents = async (req, res, next) => {
 exports.getEventById = async (req, res, next) => {
   try {
     const eventId = parseInt(req.params.eventId);
-    const event = await eventService.getEventById(eventId);
+    const userId = req.user.id;
+    // const userId = 2;
+
+    const event = await eventService.getEventById(userId, eventId);
 
     res.sendData("Event retrieved successfully", event);
   } catch (error) {
@@ -57,10 +75,16 @@ exports.updateEvent = async (req, res, next) => {
   try {
     const eventId = parseInt(req.params.eventId);
     const eventData = req.body;
+    const userId = req.user.id;
+    // const userId = 2;
 
-    // eventService.validateEventInput(eventData);
+    // validateEventInput(eventData);
 
-    const updatedEvent = await eventService.updateEvent(eventId, eventData);
+    const updatedEvent = await eventService.updateEvent(
+      eventId,
+      eventData,
+      userId
+    );
 
     res.sendData("Event updated successfully", updatedEvent);
   } catch (error) {
