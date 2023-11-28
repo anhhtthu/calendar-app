@@ -26,7 +26,7 @@ export default function CalendarViewSwitcher() {
         </NavLink>
       </li>
       <li className="w-1/4">
-        <NavLink to=" /calendar/yearview" className={activeClass}>
+        <NavLink to="/calendar/yearview" className={activeClass}>
           Year
         </NavLink>
       </li>

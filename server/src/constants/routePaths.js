@@ -6,7 +6,7 @@ const ROUTES = {
   // User Authentication Route
   AUTH: {
     BASE: `${BASE_URL}/auth`,
-    LOGIN: `/login`
+    LOGIN: `/login`,
   },
 
   // Calendars Route
@@ -17,20 +17,20 @@ const ROUTES = {
   // Events Route
   EVENTS: {
     BASE: `${BASE_URL}/events`,
-    CREATE: '/',
-    GET: '/',
-    GET_BY_ID: '/:eventId',
-    UPDATE: '/:eventId',
-    DELETE: '/:eventId',
+    CREATE: "/",
+    GET: "/",
+    GET_BY_ID: "/:eventId",
+    UPDATE: "/:eventId",
+    DELETE: "/:eventId",
   },
 
   // Recurring Event Route
   RECURRING_EVENT: {
     BASE: `${BASE_URL}/events/recurring`,
-    CREATE: '/',
-    GET_BY_ID: '/:eventId',
-    UPDATE: '/:eventId',
-    DELETE: '/:eventId'
+    CREATE: "/",
+    GET_BY_ID: "/:eventId",
+    UPDATE: "/:eventId",
+    DELETE: "/:eventId",
   },
 
   // Search & Filter Route

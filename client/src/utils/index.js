@@ -37,3 +37,17 @@ export function getDay(day = dayjs()) {
   });
   return generateDayHoursMatrix;
 }
+
+export function getYear(year = dayjs().year()) {
+  const generateYearMonthsMatrix = new Array(12).fill(null).map((_, month) => {
+    const firstDayOfTheMonth = dayjs(new Date(year, month, 1)).day();
+    let generateMonth = 0 - firstDayOfTheMonth;
+    return new Array(5).fill([]).map(() => {
+      return new Array(7).fill(null).map(() => {
+        generateMonth++;
+        return dayjs(new Date(year, month, generateMonth));
+      });
+    });
+  });
+  return generateYearMonthsMatrix;
+}

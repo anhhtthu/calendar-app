@@ -6,12 +6,12 @@ import Calendar from "./pages/Calendar";
 import MonthViewCalendar from "./pages/MonthViewCalendar";
 import WeekViewCalendar from "./pages/WeekViewCalendar";
 import DayViewCalendar from "./pages/DayViewCalendar";
+import YearViewCalendar from "./pages/YearViewCalendar";
 import React from "react";
 
 function App() {
   return (
     <Routes>
-      <Route path="*" element={<Navigate to="/login" />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/calendar" element={<Calendar />}>
@@ -19,7 +19,9 @@ function App() {
         <Route path="monthview" element={<MonthViewCalendar />} />
         <Route path="weekview" element={<WeekViewCalendar />} />
         <Route path="dayview" element={<DayViewCalendar />} />
+        <Route path="yearview" element={<YearViewCalendar />} />
       </Route>
+      <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );
 }
