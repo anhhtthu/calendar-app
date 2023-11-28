@@ -13,13 +13,14 @@ import {
 } from "../services/eventServices";
 
 export default function ContextWrapper({ children }) {
-  const [monthIndex, setMonthIndex] = useState(dayjs().month());
+  const [monthIndex, setMonthIndex] = useState(dayjs());
   const [trigger, setTrigger] = useState(false);
   const [smallCalendarMonth, setSmallCalendarMonth] = useState(null);
   const [selectedDate, setSelectedDate] = useState(0);
   const [dateModal, setDateModal] = useState(dayjs());
   const [weekIndex, setWeekIndex] = useState(dayjs());
   const [dayIndex, setDayIndex] = useState(dayjs());
+  const [yearIndex, setYearIndex] = useState(dayjs().year());
   const [currentView, setCurrentView] = useState("month");
   const [showModal, setShowModal] = useState(false);
   const [direction, setDirection] = useState(0);
@@ -32,6 +33,10 @@ export default function ContextWrapper({ children }) {
     savedEventsReducer,
     []
   );
+
+  useEffect(() => {
+    console.log(typeof yearIndex);
+  }, [yearIndex]);
 
   //create initial value for event type, in case user data is empty
   const initialEventTypes = {
@@ -139,6 +144,8 @@ export default function ContextWrapper({ children }) {
         setIsWarning,
         dayIndex,
         setDayIndex,
+        yearIndex,
+        setYearIndex,
       }}
     >
       {children}

@@ -4,16 +4,29 @@ import dayjs from "dayjs";
 export default function Year({ year }) {
   const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+  //function to check if the date is today
   function isToday(date, i) {
     const format = "YYYY-MM-DD";
     const today = dayjs().format(format);
     const currentDay = date.format(format);
+    const commonClasses = [
+      "flex",
+      "items-center",
+      "justify-center",
+      "w-6",
+      "h-6",
+      "rounded-full",
+      "cursor-pointer",
+    ];
+
     if (today === currentDay && date.month() === i) {
-      return "flex items-center justify-center w-6 h-6 bg-violet-600 text-white rounded-full";
+      return [...commonClasses, "bg-violet-600", "text-white"].join(" ");
     } else {
-      return `p-1 text-center ${
-        date.month() === i ? "text-gray-800" : "text-gray-400"
-      }`;
+      return [
+        ...commonClasses,
+        date.month() === i ? "text-gray-800" : "text-gray-400",
+        "hover:bg-gray-100",
+      ].join(" ");
     }
   }
 
@@ -30,7 +43,7 @@ export default function Year({ year }) {
             </h2>
             <div className="grid grid-cols-7 gap-1">
               {daysOfWeek.map((day, j) => (
-                <div key={j} className="p-1 text-center text-gray-500">
+                <div key={j} className="px-1 py-1 text-center text-gray-500">
                   {day}
                 </div>
               ))}

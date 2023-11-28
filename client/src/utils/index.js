@@ -1,7 +1,19 @@
 import dayjs from "dayjs";
 
-export function getMonth(month = dayjs().month()) {
-  const year = dayjs().year();
+export function getMonth(date = dayjs()) {
+  if (!(date instanceof dayjs)) {
+    date = dayjs(date);
+  }
+  let month = date.month();
+  let year = date.year();
+  if (month < 0) {
+    let offset = Math.abs(month) % 12;
+    year -= Math.ceil(Math.abs(month) / 12);
+    month = 12 - offset;
+  } else if (month > 11) {
+    year += Math.floor(month / 12);
+    month = month % 12;
+  }
   const firstDayOFTheMonth = dayjs(new Date(year, month, 1)).day();
   let generateMonth = 0 - firstDayOFTheMonth;
   const generateMonthDaysMatrix = new Array(5).fill([]).map(() => {
