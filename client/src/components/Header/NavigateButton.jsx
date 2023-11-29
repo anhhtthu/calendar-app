@@ -21,6 +21,8 @@ export default function NavigateButton() {
     currentView,
     yearIndex,
     setYearIndex,
+    currentMonthSmallCalendarIdx,
+    setCurrentMonthSmallCalendarIdx,
     setDirection,
   } = useContext(GlobalContext);
 
@@ -29,6 +31,7 @@ export default function NavigateButton() {
     if (currentView === "month") {
       let prevMonth = monthIndex.subtract(1, "month");
       setMonthIndex(prevMonth);
+      setCurrentMonthSmallCalendarIdx(prevMonth);
       setWeekIndex(weekIndex.subtract(1, "month").startOf("month"));
       setDayIndex(prevMonth.startOf("month"));
       if (prevMonth.year() !== yearIndex) {
@@ -42,6 +45,9 @@ export default function NavigateButton() {
       setDayIndex(prevWeek.startOf("isoWeek"));
       if (prevWeek.month() !== weekIndex.month()) {
         setMonthIndex(monthIndex.subtract(1, "month"));
+        setCurrentMonthSmallCalendarIdx(
+          currentMonthSmallCalendarIdx.subtract(1, "month")
+        );
       } else if (prevWeek.year() !== yearIndex) {
         setYearIndex(prevWeek.year());
       }
@@ -52,7 +58,7 @@ export default function NavigateButton() {
       setDayIndex(prevDay);
       if (prevDay.month() !== dayIndex.month()) {
         setMonthIndex(monthIndex.subtract(1, "month"));
-        // setWeekIndex(prevDay.startOf("month").startOf("week"));
+        setCurrentMonthSmallCalendarIdx(monthIndex.subtract(1, "month"));
       } else if (prevDay.week() !== dayIndex.week()) {
         setWeekIndex(weekIndex.subtract(1, "week"));
       } else if (prevDay.year() !== dayIndex.year()) {
@@ -68,6 +74,7 @@ export default function NavigateButton() {
       setDayIndex(prevYearDate.startOf("month")); // Set to the first day of January
       setWeekIndex(prevYearDate.startOf("week")); // Set to the start of the week of the first day of January
       setMonthIndex(prevYearDate.startOf("month")); // Set to January
+      setCurrentMonthSmallCalendarIdx(prevYearDate.startOf("month"));
     }
     setDirection(0);
   }
@@ -77,6 +84,8 @@ export default function NavigateButton() {
     if (currentView === "month") {
       let nextMonth = monthIndex.add(1, "month");
       setMonthIndex(nextMonth);
+      setCurrentMonthSmallCalendarIdx(nextMonth);
+      setCurrentMonthSmallCalendarIdx(nextMonth);
       setWeekIndex(weekIndex.add(1, "month").startOf("month"));
       let nextMonthDate = nextMonth.startOf("month");
       setDayIndex(nextMonthDate);
@@ -91,6 +100,7 @@ export default function NavigateButton() {
       setDayIndex(nextWeek.startOf("isoWeek"));
       if (nextWeek.month() !== weekIndex.month()) {
         setMonthIndex(monthIndex.add(1, "month"));
+        setCurrentMonthSmallCalendarIdx(monthIndex.add(1, "month"));
       } else if (nextWeek.year() !== yearIndex) {
         setYearIndex(nextWeek.year());
       }
@@ -101,6 +111,7 @@ export default function NavigateButton() {
       setDayIndex(nextDay);
       if (dayIndex.month() !== nextDay.month()) {
         setMonthIndex(monthIndex.add(1, "month"));
+        setCurrentMonthSmallCalendarIdx(monthIndex.add(1, "month"));
         setWeekIndex(nextDay.startOf("month").startOf("week"));
       } else if (dayIndex.week() !== nextDay.week()) {
         setWeekIndex(weekIndex.add(1, "week"));
@@ -116,12 +127,14 @@ export default function NavigateButton() {
       setDayIndex(nextYearDate.startOf("month")); // Set to the first day of January
       setWeekIndex(nextYearDate.startOf("week")); // Set to the start of the week of the first day of January
       setMonthIndex(nextYearDate.startOf("month")); // Set to January
+      setCurrentMonthSmallCalendarIdx(nextYearDate.startOf("month"));
     }
     setDirection(1);
   }
 
   function handleThisMonth() {
     setMonthIndex(dayjs().startOf("month"));
+    setCurrentMonthSmallCalendarIdx(dayjs().startOf("month"));
     setWeekIndex(dayjs().startOf("week"));
     setTrigger(!trigger);
     setDayIndex(dayjs());

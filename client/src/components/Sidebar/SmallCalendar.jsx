@@ -7,10 +7,7 @@ import { BsChevronRight } from "react-icons/bs";
 
 export default function SmallCalendar() {
   //local state for small calendar
-  const [currentMonthSmallCalendarIdx, setCurrentMonthSmallCalendarIdx] =
-    useState(dayjs().month());
-  const [currentWeekSmallCalendarIdx, setCurrentWeekSmallCalendarIdx] =
-    useState(dayjs().startOf("week"));
+
   const [monthSmallCalendar, setMonthSmallCalendar] = useState(getMonth());
   const {
     monthIndex,
@@ -21,42 +18,31 @@ export default function SmallCalendar() {
     weekIndex,
     setWeekIndex,
     currentView,
+    setDayIndex,
     smallCalendarMonth,
+    setMonthIndex,
+    setYearIndex,
+    currentMonthSmallCalendarIdx,
+    setCurrentMonthSmallCalendarIdx,
   } = useContext(GlobalContext);
-
-  useEffect(() => {
-    if (currentView === "month") {
-      setCurrentMonthSmallCalendarIdx(monthIndex);
-    } else if (currentView === "week") {
-      setCurrentMonthSmallCalendarIdx(dayjs(weekIndex).month());
-      setCurrentWeekSmallCalendarIdx(weekIndex);
-    }
-  }, [monthIndex, weekIndex, trigger]);
-
-  // useEffect(() => {
-  //   setMonthSmallCalendar(getWeek(currentWeekSmallCalendarIdx));
-  // }, [currentWeekSmallCalendarIdx]);
-
-  // useEffect(() => {
-  //   if (currentView === "week") {
-  //     setMonthSmallCalendar(getWeek(currentWeekSmallCalendarIdx));
-  //   } else if (currentView === "month") {
-  //     setMonthSmallCalendar(getMonth(currentMonthSmallCalendarIdx));
-  //   }
-  // }, [currentMonthSmallCalendarIdx, currentWeekSmallCalendarIdx]);
 
   useEffect(() => {
     setMonthSmallCalendar(getMonth(currentMonthSmallCalendarIdx));
   }, [currentMonthSmallCalendarIdx]);
 
   function handlePrevMonth() {
-    setCurrentMonthSmallCalendarIdx(currentMonthSmallCalendarIdx - 1);
+    setCurrentMonthSmallCalendarIdx(
+      currentMonthSmallCalendarIdx.subtract(1, "month")
+    );
   }
 
   function handleNextMonth() {
-    setCurrentMonthSmallCalendarIdx(currentMonthSmallCalendarIdx + 1);
+    setCurrentMonthSmallCalendarIdx(
+      currentMonthSmallCalendarIdx.add(1, "month")
+    );
   }
 
+  //change sty
   function isToday(day) {
     const format = "DD-MM-YYYY";
     const today = dayjs().format(format);
@@ -67,14 +53,16 @@ export default function SmallCalendar() {
     } else if (secDate === currentDay) {
       return "bg-violet-200 text-violet-600 rounded-md text-bold";
     } else {
-      return "text-gray-500";
+      return "text-gray-500 hover:bg-gray-100 rounded-md active:bg-violet-100";
     }
   }
 
-  function handleSelected() {
+  function handleSelected(day) {
     setSmallCalendarMonth(currentMonthSmallCalendarIdx);
-    //set setWeekIndex to have the selected week as small calendar when I click a random day
-    // setWeekIndex(dayjs(currentMonthSmallCalendarIdx).startOf("week"));
+    setDayIndex(day);
+    setWeekIndex(day);
+    setMonthIndex(day);
+    setYearIndex(day.year());
   }
 
   useEffect(() => {
@@ -88,9 +76,7 @@ export default function SmallCalendar() {
           <BsChevronLeft />
         </button>
         <p className="text-gray-500 font-bold">
-          {dayjs(new Date(dayjs().year(), currentMonthSmallCalendarIdx)).format(
-            "MMMM YYYY"
-          )}
+          {currentMonthSmallCalendarIdx.format("MMMM YYYY")}
         </p>
         <button onClick={handleNextMonth}>
           <BsChevronRight />
@@ -98,7 +84,7 @@ export default function SmallCalendar() {
       </header>
       <div className="grid grid-cols-7 grid-rows-6 ">
         {monthSmallCalendar[0].map((day, index) => (
-          <span key={index} className="text-gray-500 text-sm py-1">
+          <span key={index} className="text-gray-500 text-sm py-1 text-center">
             {day.format("dd").charAt(0)}
           </span>
         ))}
@@ -111,7 +97,7 @@ export default function SmallCalendar() {
                   className={`py-1 w-full ${isToday(day)}`}
                   onClick={() => {
                     setSelectedDate(day);
-                    handleSelected();
+                    handleSelected(day);
                   }}
                 >
                   <span className={`text-sm`}>{day.format("D")}</span>

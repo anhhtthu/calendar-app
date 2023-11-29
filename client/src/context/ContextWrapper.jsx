@@ -26,6 +26,9 @@ export default function ContextWrapper({ children }) {
   const [direction, setDirection] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isWarning, setIsWarning] = useState(false);
+  const [currentMonthSmallCalendarIdx, setCurrentMonthSmallCalendarIdx] =
+    useState(dayjs());
+
   const location = useLocation();
 
   //initialize savedEvents state
@@ -146,6 +149,8 @@ export default function ContextWrapper({ children }) {
         setDayIndex,
         yearIndex,
         setYearIndex,
+        currentMonthSmallCalendarIdx,
+        setCurrentMonthSmallCalendarIdx
       }}
     >
       {children}

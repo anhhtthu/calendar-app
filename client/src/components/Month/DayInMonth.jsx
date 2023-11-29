@@ -9,11 +9,17 @@ export default function DayInMonth(props) {
     return dayjs().isSame(day, "day");
   }
 
+  function isInCurrentMonth() {
+    return dayjs().isSame(day, "month");
+  }
+
   return (
     <div
       className={`border ${
         isToday() ? monthStyles.today : "border-gray-200"
-      } flex flex-col px-2`}
+      } flex flex-col px-2 ${
+        isInCurrentMonth() ? "text-black" : "text-gray-500"
+      }`}
     >
       <div className="flex">
         <p className="text-md text-gray-500 font-semibold p-1 my-1 text-left">
