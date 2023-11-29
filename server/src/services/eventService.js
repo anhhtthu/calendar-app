@@ -8,6 +8,7 @@ const {
   calculateTimeframeDates,
   notifyAttendeesOfUpdates,
 } = require("./eventServiceHelpers");
+const recurringEventService = require("./recurringEventService");
 
 // CREATE EVENT LOGIC
 exports.createEvent = async (userId, eventData) => {
@@ -21,6 +22,8 @@ exports.createEvent = async (userId, eventData) => {
     allDay,
     eventType,
     color,
+    isRecurring,
+    recurringDetails, // Details about the recurring event: pattern, endDate, numberOfOccurrences
   } = eventData;
 
   // retrieve user's calendar
@@ -53,18 +56,31 @@ exports.createEvent = async (userId, eventData) => {
     );
   }
 
-  const newEvent = await prisma.event.create({
-    data: {
-      calendarId: calendar.id,
-      title,
-      description,
-      location,
-      startTime: new Date(startTime),
-      endTime: new Date(endTime),
-      allDay: allDay,
-      eventType,
-      color,
-    },
+  const newEvent = await prisma.$transaction(async (prisma) => {
+    const mainEvent = await prisma.event.create({
+      data: {
+        calendarId: calendar.id,
+        title,
+        description,
+        location,
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
+        allDay: allDay,
+        eventType,
+        color,
+      },
+    });
+
+    // Handle recurring events
+    if (isRecurring && recurringDetails) {
+      createRecurringEvent;
+      await recurringEventService.createRecurringEvent(
+        mainEvent,
+        recurringDetails
+      );
+    }
+
+    return mainEvent;
   });
 
   return newEvent;

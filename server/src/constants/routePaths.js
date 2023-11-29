@@ -26,11 +26,12 @@ const ROUTES = {
 
   // Recurring Event Route
   RECURRING_EVENT: {
-    BASE: `${BASE_URL}/events/recurring`,
+    BASE: `/api/v1/events/recurring`,
     CREATE: "/",
-    GET_BY_ID: "/:eventId",
-    UPDATE: "/:eventId",
-    DELETE: "/:eventId",
+    GET_BY_CALENDAR_ID: "/calendar/:calendarId",
+    GET_BY_ID: "/:recurringEventId",
+    UPDATE: "/:recurringEventId",
+    DELETE: "/:recurringEventId",
   },
 
   // Search & Filter Route

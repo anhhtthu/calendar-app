@@ -1,5 +1,11 @@
 const express = require("express");
-const { errorHandler, logRequest, bodyParser, cors, responseFormat } = require("./middleware");
+const {
+  errorHandler,
+  logRequest,
+  bodyParser,
+  cors,
+  responseFormat,
+} = require("./middleware");
 const CustomError = require("./utils/customError");
 const { logger } = require("./utils/logger");
 const CronJob = require("cron").CronJob;
@@ -18,7 +24,6 @@ app.use(responseFormat);
 
 // Routes
 app.use(ROUTES.EVENTS.BASE, eventRoutes);
-app.use(ROUTES.RECURRING_EVENT.BASE, recurringEventRoutes);
 
 // Catch all unhandled routes and other errors
 app.use((req, res, next) => {
