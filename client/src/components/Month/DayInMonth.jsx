@@ -1,10 +1,22 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import monthStyles from "./month.module.css";
 import GlobalContext from "../../context/GlobalContext";
 export default function DayInMonth(props) {
   const { day } = { ...props };
-  const { setDateModal, setShowModal } = useContext(GlobalContext);
+  const { setDateModal, setShowModal, savedEvents, setSelectedEvent } =
+    useContext(GlobalContext);
+  const [monthEvents, setMonthEvents] = useState([]);
+
+  //filter events which match with the days in calendar
+  useEffect(() => {
+    const event = savedEvents.filter(
+      (event) => dayjs(event.date).format("DD-MM-YY") === day.format("DD-MM-YY")
+    );
+    setMonthEvents(event);
+  }, [savedEvents, day]);
+
+  //style today on calendar
   function isToday() {
     return dayjs().isSame(day, "day");
   }
@@ -12,6 +24,10 @@ export default function DayInMonth(props) {
   function isInCurrentMonth() {
     return dayjs().isSame(day, "month");
   }
+
+  useEffect(() => {
+    console.log(savedEvents);
+  }, [savedEvents]);
 
   return (
     <div
@@ -33,7 +49,17 @@ export default function DayInMonth(props) {
           setDateModal(day);
           setShowModal(true);
         }}
-      ></div>
+      >
+        {monthEvents.map((event, index) => (
+          <div
+            className={`bg-${event.label}-200 p-1 mr-3 text-xs text-gray-600 rounded mb-1 truncate`}
+            key={index}
+            onClick={() => setSelectedEvent(event)}
+          >
+            {event.title}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

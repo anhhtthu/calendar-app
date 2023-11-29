@@ -4,9 +4,13 @@ import { modalVariants } from "../../animations/modalVariants";
 import { AiOutlineClose } from "react-icons/ai";
 import { BsCheck } from "react-icons/bs";
 import GlobalContext from "../../context/GlobalContext";
-import { Menu, Transition } from "@headlessui/react";
+import { Menu, Transition, Listbox } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import { saveCalendarEvents } from "../../services/eventServices";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import dayjs from "dayjs";
+
+dayjs.extend(customParseFormat);
 
 export default function CreateEventModal() {
   const {
@@ -19,32 +23,74 @@ export default function CreateEventModal() {
     eventTypesDispatch,
     setIsWarning,
     isWarning,
+    selectedEvent,
+    setSelectedEvent,
   } = useContext(GlobalContext);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState(selectedEvent ? selectedEvent.title : "");
+  const [description, setDescription] = useState(
+    selectedEvent ? selectedEvent.description : ""
+  );
   const currentTime = dateModal.format("HH:mm");
   const currentDate = dateModal.format("YYYY-MM-DD");
-  const [chosenTime, setChosenTime] = useState(currentTime);
-  const [chosenDate, setChosenDate] = useState(currentDate);
+  const [startTime, setStartTime] = useState(
+    selectedEvent ? selectedEvent.startTime.format("HH:mm") : currentTime
+  );
+  const [chosenDate, setChosenDate] = useState(
+    selectedEvent ? selectedEvent.date : currentDate
+  );
+  const [endTime, setEndTime] = useState(
+    selectedEvent ? selectedEvent.endTime.format("HH:mm") : currentTime
+  );
+
+  const hours = Array.from({ length: 24 }, (_, i) =>
+    i < 10 ? `0${i}:00` : `${i}:00`
+  );
+
+  useEffect(() => {
+    console.log(endTime);
+  }, [endTime]);
+
+  //list of label color for event
   const labelClasses = ["indigo", "gray", "green", "blue", "rose", "purple"];
-  const [selectedLabel, setSelectedLabel] = useState(labelClasses[0]);
+
+  //choose what label for the event
+  const [selectedLabel, setSelectedLabel] = useState(
+    selectedEvent
+      ? labelClasses.find((label) => label === selectedEvent.label)
+      : labelClasses[0]
+  );
 
   //desc: handle submit event
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    //convert time to dayjs
+    const startTimeDayjs = dayjs(startTime, "HH:mm");
+    const endTimeDayjs = dayjs(endTime, "HH:mm");
+
     const newEvent = {
       title,
       description,
       date: chosenDate,
-      time: chosenTime,
+      startTime: startTimeDayjs,
+      endTime: endTimeDayjs,
       label: selectedLabel,
       totalEventTypes,
     };
     saveCalendarEvents([...savedEvents, newEvent]);
-    console.log(newEvent);
-    dispatchCalendarEvent({ type: "ADD_EVENT", payload: newEvent });
+    if (selectedEvent) {
+      dispatchCalendarEvent({ type: "UPDATE_EVENT", payload: newEvent });
+    } else {
+      dispatchCalendarEvent({ type: "CREATE_EVENT", payload: newEvent });
+    }
     setShowModal(false);
+    setSelectedEvent(null);
   };
+
+  useEffect(() => {
+    console.log(savedEvents);
+    console.log(typeof startTime);
+  }, [savedEvents, startTime, endTime]);
 
   //desc: handle selected event type
   const handleSelectedEventType = (eventType) => {
@@ -79,7 +125,13 @@ export default function CreateEventModal() {
                   You can create event, meeting and tasks
                 </span>
               </div>
-              <button type="button" onClick={() => setIsWarning(true)}>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsWarning(true);
+                  setSelectedEvent(null);
+                }}
+              >
                 <AiOutlineClose className="text-gray-400 text-xl" />
               </button>
             </header>
@@ -118,12 +170,67 @@ export default function CreateEventModal() {
                   </div>
                   <div className="flex flex-col gap-2 w-1/2">
                     <label htmlFor="time">Time</label>
-                    <input
-                      type="time"
-                      value={chosenTime}
-                      onChange={(e) => setChosenTime(e.target.value)}
-                      className="border border-gray-300 rounded-md p-2"
-                    />
+                    {/* <div className="flex flex-row gap-2 justify-center">
+                      <input
+                        type="time"
+                        value={startTime}
+                        onChange={(e) => setStartTime(e.target.value)}
+                        className="border border-gray-300 rounded-md p-2"
+                      />
+
+                      <input
+                        type="time"
+                        value={endTime}
+                        onChange={(e) => setEndTime(e.target.value)}
+                        min={startTime}
+                        className="border border-gray-300 rounded-md p-2"
+                      />
+                    </div> */}
+                    <div className="flex flex-1 flex-row gap-2 justify-center relative">
+                      <Listbox value={startTime} onChange={setStartTime}>
+                        <Listbox.Button className="border border-gray-300 rounded-md w-1/2">
+                          {startTime}
+                        </Listbox.Button>
+                        <Listbox.Options className="cursor-pointer scrollbar scrollbar-thumb-gray-200 scrollbar-track-gray-100 border border-gray-300 top-10 left-0 bg-white rounded-md p-2 absolute z-10 w-1/2 max-h-40 overflow-auto">
+                          {hours.map((hour, index) => (
+                            <Listbox.Option key={index} value={hour}>
+                              {({ active }) => (
+                                <span
+                                  className={`block ${
+                                    active ? "bg-blue-200" : ""
+                                  }`}
+                                >
+                                  {hour}
+                                </span>
+                              )}
+                            </Listbox.Option>
+                          ))}
+                        </Listbox.Options>
+                      </Listbox>
+
+                      <Listbox value={endTime} onChange={setEndTime}>
+                        <Listbox.Button className="border border-gray-300 rounded-md w-1/2">
+                          {endTime}
+                        </Listbox.Button>
+                        <Listbox.Options className=" cursor-pointer scrollbar scrollbar-thumb-gray-200 scrollbar-track-gray-100 border border-gray-300 bg-white top-10 -right-1 w-1/2 rounded-md p-2 absolute z-10 max-h-60 overflow-auto">
+                          {hours
+                            .slice(hours.indexOf(startTime))
+                            .map((hour, index) => (
+                              <Listbox.Option key={index} value={hour}>
+                                {({ active }) => (
+                                  <span
+                                    className={`block ${
+                                      active ? "bg-blue-200" : ""
+                                    }`}
+                                  >
+                                    {hour}
+                                  </span>
+                                )}
+                              </Listbox.Option>
+                            ))}
+                        </Listbox.Options>
+                      </Listbox>
+                    </div>
                   </div>
                 </div>
                 <div className="flex flex-col mt-1">

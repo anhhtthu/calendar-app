@@ -26,6 +26,7 @@ export default function ContextWrapper({ children }) {
   const [direction, setDirection] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isWarning, setIsWarning] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [currentMonthSmallCalendarIdx, setCurrentMonthSmallCalendarIdx] =
     useState(dayjs());
 
@@ -43,8 +44,8 @@ export default function ContextWrapper({ children }) {
 
   //create initial value for event type, in case user data is empty
   const initialEventTypes = {
-    eventTypes: [],
-    selectedEventType: null,
+    eventTypes: ["My calendar"],
+    selectedEventType: "My calendar",
   };
 
   //initialize eventTypes state
@@ -80,14 +81,14 @@ export default function ContextWrapper({ children }) {
   }, [location]);
 
   //initialize eventTypes state when savedEvents is updated
-  useEffect(() => {
-    if (savedEvents && savedEvents.length > 0) {
-      eventTypesDispatch({
-        type: "INITIAL_EVENT_TYPE",
-        payload: savedEvents.totalEventTypes,
-      });
-    }
-  }, [savedEvents]);
+  // useEffect(() => {
+  //   if (savedEvents && savedEvents.length > 0) {
+  //     eventTypesDispatch({
+  //       type: "INITIAL_EVENT_TYPE",
+  //       payload: savedEvents.totalEventTypes,
+  //     });
+  //   }
+  // }, [savedEvents]);
 
   //fetch events from database and initialize savedEvents state
   useEffect(() => {
@@ -149,8 +150,10 @@ export default function ContextWrapper({ children }) {
         setDayIndex,
         yearIndex,
         setYearIndex,
+        setSelectedEvent,
+        selectedEvent,
         currentMonthSmallCalendarIdx,
-        setCurrentMonthSmallCalendarIdx
+        setCurrentMonthSmallCalendarIdx,
       }}
     >
       {children}

@@ -24,6 +24,10 @@ export default function Week(props) {
     }
   }
 
+  useEffect(() => {
+    console.log(week);
+  }, []);
+
   return (
     <React.Fragment>
       <div className=" py-2 w-full justify-center grid grid-cols-[1fr,11fr] bg-gray-200 rounded-lg ">
@@ -61,7 +65,7 @@ export default function Week(props) {
               key={index}
               className="text-md text-gray-400 font-semibold -mt-3 text-center"
             >
-              {index + 1}:00
+              {index}:00
             </p>
           ))}
         </div>

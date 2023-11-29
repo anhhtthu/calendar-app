@@ -20,11 +20,17 @@ module.exports = {
     options: {
       safelist: [
         "bg-indigo-500",
+        "bg-indigo-200",
         "bg-gray-500",
+        "bg-gray-200",
         "bg-green-500",
+        "bg-green-200",
         "bg-blue-500",
+        "bg-blue-200",
         "bg-rose-500",
+        "bg-rose-200",
         "bg-purple-500",
+        "bg-purple-200",
       ],
     },
   },

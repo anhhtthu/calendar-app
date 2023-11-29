@@ -8,6 +8,7 @@ export default function AddEventButton() {
     <button
       className="py-1 px-4 bg-neutral-900 text-slate-50 rounded hover:shadow"
       onClick={() => setShowModal(true)}
+      title="Click to create new event"
     >
       + Add
     </button>

@@ -31,7 +31,7 @@ export default function Year({ year }) {
   }
 
   return (
-    <div className="grid grid-cols-4 gap-4 p-4">
+    <div className="grid grid-cols-4 gap-4 p-4 overflow-auto h-[650px] scrollbar scrollbar-thumb-gray-200 scrollbar-track-gray-100">
       {year.map((month, i) => {
         // Find the first day that actually belongs to the current month
         const firstDay = month.flat().find((day) => day.month() === i);

@@ -80,7 +80,11 @@ export default function EventType() {
                       onChange={(e) => setInputEventType(e.target.value)}
                       className="p-2 text-gray-500 placeholder:text-gray-400 text-xs w-3/4 border-gray-300 rounded-md"
                     />
-                    <button className="w-1/4 flex justify-center" type="submit">
+                    <button
+                      className="w-1/4 flex justify-center"
+                      type="submit"
+                      title="Create new event type"
+                    >
                       <PlusIcon className=" w-1/2 p-1 text-gray-500 hover:bg-gray-200 rounded-full" />
                     </button>
                   </form>
