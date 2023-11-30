@@ -1,10 +1,10 @@
 const { logger } = require("../utils/logger");
 const eventService = require("../services/eventService");
 const {
-  validateEventInput,
   setupEventReminder,
   processInvitees,
-} = require("../services/eventServiceHelpers");
+} = require("../services/eventService");
+const { validateEventInput } = require("../services/eventServiceHelpers");
 
 exports.createEvent = async (req, res, next) => {
   try {
@@ -78,8 +78,8 @@ exports.updateEvent = async (req, res, next) => {
   try {
     const eventId = parseInt(req.params.eventId);
     const eventData = req.body;
-    // const userId = req.user.id;
-    const userId = 2;
+    const userId = req.user.id;
+    // const userId = 2;
 
     // validateEventInput(eventData);
 
@@ -99,8 +99,8 @@ exports.updateEvent = async (req, res, next) => {
 exports.deleteEvent = async (req, res, next) => {
   try {
     const eventId = parseInt(req.params.eventId);
-    // const userId = req.user.id;
-    const userId = 2;
+    const userId = req.user.id;
+    // const userId = 4;
 
     await eventService.deleteEvent(eventId, userId);
 

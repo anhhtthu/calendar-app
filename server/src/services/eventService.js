@@ -3,10 +3,10 @@ const { prisma } = require("../database/client");
 const moment = require("moment");
 const CustomError = require("../utils/customError");
 const {
-  updateEventReminder,
-  updateInvitees,
   calculateTimeframeDates,
-  notifyAttendeesOfUpdates,
+  filterUpdateData,
+  validateTime,
+  calculateReminderTime,
 } = require("./eventServiceHelpers");
 const recurringEventService = require("./recurringEventService");
 
@@ -78,33 +78,6 @@ exports.createEvent = async (userId, eventData) => {
     );
   }
   return mainEvent;
-
-  // const newEvent = await prisma.$transaction(async (prisma) => {
-  //   const mainEvent = await prisma.event.create({
-  //     data: {
-  //       calendarId: calendar.id,
-  //       title,
-  //       description,
-  //       location,
-  //       startTime: new Date(startTime),
-  //       endTime: new Date(endTime),
-  //       allDay: allDay,
-  //       eventType,
-  //       color,
-  //     },
-  //   });
-
-  //   // Handle recurring events
-  //   if (isRecurring && recurringDetails) {
-  //     await recurringEventService.createRecurringEvent(
-  //       mainEvent,
-  //       recurringDetails
-  //     );
-  //   }
-  //   return mainEvent;
-  // });
-
-  // return newEvent;
 };
 
 // GET EVENT BY ID LOGIC
@@ -202,31 +175,10 @@ exports.updateEvent = async (eventId, newEventData, userId) => {
   }
 
   // prepare the updated data
-  let updateData = {};
-  for (const key in newEventData) {
-    if (newEventData.hasOwnProperty(key) && key !== "invitees") {
-      updateData[key] = newEventData[key];
-    }
-  }
+  const updateData = filterUpdateData(newEventData);
 
   // validate start and end time
-  if (
-    updateData.startTime &&
-    updateData.endTime &&
-    updateData.startTime >= updateData.endTime
-  ) {
-    throw new CustomError(
-      400,
-      ERROR_CODE.EVENT_TIME_INVALID,
-      "Start time must be before end time."
-    );
-  }
-  if (updateData.startTime) {
-    updateData.startTime = new Date(updateData.startTime);
-  }
-  if (updateData.endTime) {
-    updateData.endTime = new Date(updateData.endTime);
-  }
+  validateTime(updateData);
 
   // update event
   const updatedEvent = await prisma.event.update({
@@ -242,6 +194,18 @@ exports.updateEvent = async (eventId, newEventData, userId) => {
   // if (shouldNotifyAttendees) {
   //   await notifyAttendeesOfUpdates(eventId, existingEvent.eventAttendees);
   // }
+
+  // check for recurring event updates
+  if ("isRecurring" in newEventData) {
+    if (newEventData.isRecurring) {
+      await recurringEventService.handleAddRecurringOption(
+        eventId,
+        newEventData.recurringDetails
+      );
+    } else {
+      await recurringEventService.handleRemoveRecurringOption(eventId);
+    }
+  }
 
   // update reminders if necessary
   if (
@@ -263,7 +227,7 @@ exports.updateEvent = async (eventId, newEventData, userId) => {
 exports.deleteEvent = async (eventId, userId) => {
   const event = await prisma.event.findUnique({
     where: { id: eventId },
-    include: { calendar: true },
+    include: { calendar: true, recurring: true },
   });
 
   if (!event) {
@@ -278,5 +242,163 @@ exports.deleteEvent = async (eventId, userId) => {
     );
   }
 
-  await prisma.event.delete({ where: { id: eventId } });
+  // await prisma.event.delete({ where: { id: eventId } });
+  await prisma.event.deleteMany({
+    where: {
+      OR: [{ id: eventId }, { recurring: { some: { eventId: eventId } } }],
+    },
+  });
+};
+
+exports.processInvitees = async (newEvent, invitees) => {
+  if (invitees && Array.isArray(invitees)) {
+    for (const invitee of invitees) {
+      const user = await prisma.user.findFirst({
+        where: { OR: [{ email: invitee }, { userName: invitee }] },
+      });
+
+      if (!user) {
+        logger.errorf("Invitee user not found: %v", invitee);
+        continue;
+      }
+
+      // check if invitee has calendar
+      let inviteeCalendar = await prisma.calendar.findFirst({
+        where: { userId: user.id },
+      });
+      if (!inviteeCalendar) {
+        continue;
+      }
+
+      // create EventAttendee and Notification for each invitee
+      const eventAttendee = await prisma.eventAttendee.create({
+        data: {
+          eventId: newEvent.id,
+          attendeeId: user.id,
+          status: EVENT_ENUM.INVITATION_STATUS.INVITED,
+        },
+      });
+
+      // create notification for invitation
+      await prisma.notification.create({
+        data: {
+          eventId: newEvent.id,
+          userId: user.id,
+          eventAttendeeId: eventAttendee.id,
+          type: EVENT_ENUM.EVENT_NOTIFY.INVITATION,
+          sendAt: new Date(newEvent.startTime),
+        },
+      });
+    }
+  }
+};
+
+exports.setupEventReminder = async (
+  newEvent,
+  reminderOption,
+  customReminderTime,
+  userId
+) => {
+  const reminderTime = calculateReminderTime(
+    newEvent.startTime,
+    reminderOption,
+    customReminderTime
+  );
+
+  if (reminderTime) {
+    await prisma.notification.create({
+      data: {
+        eventId: newEvent.id,
+        userId: userId,
+        type: EVENT_ENUM.EVENT_NOTIFY.REMINDER,
+        sendAt: reminderTime,
+      },
+    });
+  }
+};
+
+const updateEventReminder = async (eventId, newEventData, userId) => {
+  const reminderOption = newEventData.reminderOption;
+
+  // handle no reminder case
+  if (reminderOption === EVENT_ENUM.REMINDER.NONE) {
+    await prisma.notification.deleteMany({
+      where: { eventId: eventId, type: EVENT_ENUM.EVENT_NOTIFY.REMINDER },
+    });
+    return;
+  }
+
+  const reminderTime = calculateReminderTime(
+    newEventData.startTime,
+    reminderOption,
+    newEventData.customReminderTime
+  );
+
+  // check if an existing reminder needs to be updated or a new one created
+  const existingReminder = await prisma.notification.findFirst({
+    where: { eventId: eventId, type: EVENT_ENUM.EVENT_NOTIFY.REMINDER },
+  });
+
+  if (existingReminder) {
+    if (existingReminder.sendAt.getTime() !== reminderTime.getTime()) {
+      await prisma.notification.update({
+        where: { id: existingReminder.id },
+        data: { sendAt: reminderTime, sent: false },
+      });
+    }
+  } else {
+    await prisma.notification.create({
+      data: {
+        eventId: eventId,
+        userId: userId,
+        type: EVENT_ENUM.EVENT_NOTIFY.REMINDER,
+        sendAt: reminderTime,
+      },
+    });
+  }
+};
+
+const updateInvitees = async (eventId, newInvitees, originalEventData) => {
+  const existingInviteeEvents = await prisma.eventAttendee.findMany({
+    where: { eventId: eventId },
+    include: {
+      attendee: true,
+    },
+  });
+
+  const inviteeMap = new Map(
+    existingInviteeEvents.map((ie) => [
+      ie.attendee.email || ie.attendee.userName,
+      ie,
+    ])
+  );
+
+  const newInvites = newInvitees.filter((invitee) => !inviteeMap.has(invitee));
+  const removedInvites = existingInviteeEvents.filter(
+    (ie) => !newInvitees.includes(ie.attendee.email || ie.attendee.userName)
+  );
+
+  // process new invitations
+  await this.processInvitees(originalEventData, newInvites);
+
+  // process removed invitations
+  for (const inviteeEvent of removedInvites) {
+    await prisma.eventAttendee.delete({ where: { id: inviteeEvent.id } });
+  }
+};
+
+const notifyAttendeesOfUpdates = async (eventId, attendees) => {
+  // Logic to create and send notifications to attendees
+  for (const attendee of attendees) {
+    await prisma.notification.create({
+      data: {
+        userId: attendee.attendeeId,
+        eventId: eventId,
+        type: "EVENT_UPDATE",
+        message: "Event details have been updated.",
+        sent: false, // assuming notifications are sent out by a separate process
+        sendAt: new Date(), // set appropriate time for sending the notification
+      },
+    });
+  }
 };
