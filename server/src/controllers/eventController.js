@@ -40,8 +40,8 @@ exports.listEvents = async (req, res, next) => {
   try {
     const { timeframe, year, month, customStartTime, customEndTime } =
       req.query;
-    // const userId = req.user.id;
-    const userId = 3;
+    const userId = req.user.id;
+    // const userId = 4;
 
     const events = await eventService.listEvents(
       userId,
@@ -63,7 +63,7 @@ exports.getEventById = async (req, res, next) => {
   try {
     const eventId = parseInt(req.params.eventId);
     const userId = req.user.id;
-    // const userId = 2;
+    // const userId = 4;
 
     const event = await eventService.getEventById(userId, eventId);
 

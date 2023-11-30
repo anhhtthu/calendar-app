@@ -111,7 +111,12 @@ exports.createEvent = async (userId, eventData) => {
 exports.getEventById = async (userId, eventId) => {
   const event = await prisma.event.findUnique({
     where: { id: eventId },
-    include: { calendar: true, eventAttendees: true, notifications: true },
+    include: {
+      calendar: true,
+      eventAttendees: true,
+      notifications: true,
+      recurring: true,
+    },
   });
 
   if (!event) {
@@ -130,7 +135,9 @@ exports.getEventById = async (userId, eventId) => {
     );
   }
 
-  return event;
+  const allEvents = [event, ...event.recurring];
+
+  return allEvents;
 };
 
 // GET LIST EVENTS LOGIC
@@ -168,7 +175,7 @@ exports.listEvents = async (
       startTime: { gte: startDate.toDate() },
       endTime: { lte: endDate.toDate() },
     },
-    include: { eventAttendees: true, notifications: true },
+    include: { eventAttendees: true, notifications: true, recurring: true },
     orderBy: { startTime: "asc" },
   });
 

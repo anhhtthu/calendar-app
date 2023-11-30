@@ -60,6 +60,9 @@ const calculateReminderTime = (
 
 exports.calculateTimeframeDates = (timeframe, year, month) => {
   const now = moment();
+  year ??= now.year();
+  month ??= now.month() + 1;
+
   let startDate, endDate;
 
   switch (timeframe) {
