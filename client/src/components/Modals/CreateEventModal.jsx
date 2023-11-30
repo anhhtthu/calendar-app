@@ -30,7 +30,7 @@ export default function CreateEventModal() {
   const [description, setDescription] = useState(
     selectedEvent ? selectedEvent.description : ""
   );
-  const currentTime = dateModal.format("HH:mm");
+  const currentTime = dateModal.startOf("hour").format("HH:mm");
   const currentDate = dateModal.format("YYYY-MM-DD");
   const [startTime, setStartTime] = useState(
     selectedEvent ? selectedEvent.startTime.format("HH:mm") : currentTime
@@ -87,10 +87,6 @@ export default function CreateEventModal() {
     setSelectedEvent(null);
   };
 
-  useEffect(() => {
-    console.log(savedEvents);
-    console.log(typeof startTime);
-  }, [savedEvents, startTime, endTime]);
 
   //desc: handle selected event type
   const handleSelectedEventType = (eventType) => {
@@ -106,7 +102,7 @@ export default function CreateEventModal() {
     <AnimatePresence>
       {showModal && (
         <motion.div
-          className="h-screen w-full fixed left-0 flex justify-center items-center backdrop-blur-sm"
+          className="h-screen w-full fixed z-40 left-0 flex justify-center items-center backdrop-blur-sm"
           variants={modalVariants}
           initial="hidden"
           animate="visible"
@@ -309,7 +305,9 @@ export default function CreateEventModal() {
                 className="flex justify-center items-center gap-1 bg-black text-white rounded-lg p-2"
               >
                 <BsCheck className="text-2xl" />
-                <span>Create Schedule</span>
+                <span>
+                  {selectedEvent ? "Update Event" : "Create Schedule"}
+                </span>
               </button>
             </footer>
           </form>

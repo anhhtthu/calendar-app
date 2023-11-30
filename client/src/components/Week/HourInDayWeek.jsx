@@ -1,20 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import GlobalContext from "../../context/GlobalContext";
+import isBetween from "dayjs/plugin/isBetween";
 import dayjs from "dayjs";
 
-export default function HourInDayWeek(props) {
-  const { setDateModal, setShowModal, setselectedEvent, savedEvents } =
-    useContext(GlobalContext);
-  const { hour } = { ...props };
-  const [weekEvents, setWeekEvents] = useState([]);
+dayjs.extend(isBetween);
 
-  useEffect(() => {
-    const event = savedEvents.filter(
-      (event) =>
-        dayjs(event.date).format("DD-MM-YY") === hour.format("DD-MM-YY") &&
-        dayjs(event.startTime).format("HH:mm")
-    );
-  });
+export default function HourInDayWeek(props) {
+  const { setDateModal, setShowModal } = useContext(GlobalContext);
+  const { hour } = { ...props };
 
   const handleTimeEvent = (hour) => {
     setDateModal(hour);

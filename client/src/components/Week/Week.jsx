@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useContext, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { calendarVariants } from "../../animations/calendarVariants";
 import GlobalContext from "../../context/GlobalContext";
@@ -6,8 +6,20 @@ import HourInDayWeek from "./HourInDayWeek";
 import dayjs from "dayjs";
 export default function Week(props) {
   const { week } = { ...props };
-  const { direction, weekIndex } = useContext(GlobalContext);
+  const { direction, weekIndex, savedEvents, setSelectedEvent } =
+    useContext(GlobalContext);
   const [isFirstMount, setIsFirstMount] = useState(true);
+  const [weekEvents, setWeekEvents] = useState([]);
+  const [rowHeight, setRowHeight] = useState(0);
+  const rowRef = useRef(null);
+
+  useEffect(() => {
+    if (rowRef.current) {
+      const height = rowRef.current.getBoundingClientRect().height;
+      setRowHeight(height);
+    }
+    console.log(rowHeight);
+  }, []);
 
   useEffect(() => {
     setIsFirstMount(false);
@@ -27,6 +39,22 @@ export default function Week(props) {
   useEffect(() => {
     console.log(week);
   }, []);
+
+  useEffect(() => {
+    const events = savedEvents.filter((event) => {
+      const eventDate = dayjs(event.date);
+
+      const isSameDay = week.some((dayArray) =>
+        dayArray.some((day) => eventDate.isSame(dayjs(day), "day"))
+      );
+      return isSameDay;
+    });
+    setWeekEvents(events);
+  }, [savedEvents, week]);
+
+  useEffect(() => {
+    console.log("weekEvents", weekEvents);
+  }, [weekEvents]);
 
   return (
     <React.Fragment>
@@ -69,12 +97,42 @@ export default function Week(props) {
             </p>
           ))}
         </div>
-        <div className="grid  grid-cols-7  grid-rows-24">
-          {week.map((row, index) => (
-            <React.Fragment key={index}>
-              {row.map((hour, index) => (
-                <HourInDayWeek key={index} hour={hour} />
+        <div className="grid grid-cols-7 grid-rows-24 relative">
+          {week.map((day, dayIndex) => (
+            <React.Fragment key={dayIndex}>
+              {day.map((hour, hourIndex) => (
+                <div ref={hourIndex === 0 ? rowRef : null}>
+                  <HourInDayWeek key={hourIndex} hour={hour} />
+                </div>
               ))}
+              {weekEvents
+                // .filter((event) => dayjs(event.date).day() === dayIndex)
+                .map((event, index) => {
+                  const startRow = event.startTime.hour();
+                  const endRow = event.endTime.hour();
+                  const span = endRow - startRow;
+                  const dayOfWeek = dayjs(event.date).day();
+
+                  console.log("dayOfWeek", dayOfWeek);
+
+                  return (
+                    <div
+                      key={index}
+                      className={`absolute bg-${event.label}-200 
+                      p-2 mr-3 w-36 text-gray-600 rounded-md border border-white mb-1 truncate`}
+                      style={{
+                        top: `${startRow * rowHeight}px`,
+                        height: `${span * rowHeight}px`,
+                        gridColumnStart: dayOfWeek + 1,
+                      }}
+                    >
+                      <p className="text-sm font-semibold">{event.title}</p>
+                      <p className="text-xs mt-1">{` ${event.startTime.format(
+                        "HH:mm"
+                      )} - ${event.endTime.format("HH:mm")}`}</p>
+                    </div>
+                  );
+                })}
             </React.Fragment>
           ))}
         </div>

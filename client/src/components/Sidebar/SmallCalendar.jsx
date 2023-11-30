@@ -65,9 +65,7 @@ export default function SmallCalendar() {
     setYearIndex(day.year());
   }
 
-  useEffect(() => {
-    console.log(smallCalendarMonth);
-  }, [smallCalendarMonth]);
+
 
   return (
     <div className="mt-9">
