@@ -78,6 +78,7 @@ model RecurringEvent {
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId Int
   pattern String
+  startDate DateTime?
   endDate DateTime?
   numberOfOccurrences Int?
   createdAt DateTime @default(now())

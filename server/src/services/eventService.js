@@ -56,34 +56,55 @@ exports.createEvent = async (userId, eventData) => {
     );
   }
 
-  const newEvent = await prisma.$transaction(async (prisma) => {
-    const mainEvent = await prisma.event.create({
-      data: {
-        calendarId: calendar.id,
-        title,
-        description,
-        location,
-        startTime: new Date(startTime),
-        endTime: new Date(endTime),
-        allDay: allDay,
-        eventType,
-        color,
-      },
-    });
-
-    // Handle recurring events
-    if (isRecurring && recurringDetails) {
-      createRecurringEvent;
-      await recurringEventService.createRecurringEvent(
-        mainEvent,
-        recurringDetails
-      );
-    }
-
-    return mainEvent;
+  const mainEvent = await prisma.event.create({
+    data: {
+      calendarId: calendar.id,
+      title,
+      description,
+      location,
+      startTime: new Date(startTime),
+      endTime: new Date(endTime),
+      allDay: allDay,
+      eventType,
+      color,
+    },
   });
 
-  return newEvent;
+  // Handle recurring events
+  if (isRecurring && recurringDetails) {
+    await recurringEventService.createRecurringEvent(
+      mainEvent,
+      recurringDetails
+    );
+  }
+  return mainEvent;
+
+  // const newEvent = await prisma.$transaction(async (prisma) => {
+  //   const mainEvent = await prisma.event.create({
+  //     data: {
+  //       calendarId: calendar.id,
+  //       title,
+  //       description,
+  //       location,
+  //       startTime: new Date(startTime),
+  //       endTime: new Date(endTime),
+  //       allDay: allDay,
+  //       eventType,
+  //       color,
+  //     },
+  //   });
+
+  //   // Handle recurring events
+  //   if (isRecurring && recurringDetails) {
+  //     await recurringEventService.createRecurringEvent(
+  //       mainEvent,
+  //       recurringDetails
+  //     );
+  //   }
+  //   return mainEvent;
+  // });
+
+  // return newEvent;
 };
 
 // GET EVENT BY ID LOGIC
