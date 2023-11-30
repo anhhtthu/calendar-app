@@ -6,7 +6,7 @@ import HourInDayWeek from "./HourInDayWeek";
 import dayjs from "dayjs";
 export default function Week(props) {
   const { week } = { ...props };
-  const { direction, weekIndex, savedEvents, setSelectedEvent } =
+  const { direction, weekIndex, savedEvents, setSelectedEvent, setShowModal } =
     useContext(GlobalContext);
   const [isFirstMount, setIsFirstMount] = useState(true);
   const [weekEvents, setWeekEvents] = useState([]);
@@ -18,7 +18,6 @@ export default function Week(props) {
       const height = rowRef.current.getBoundingClientRect().height;
       setRowHeight(height);
     }
-    console.log(rowHeight);
   }, []);
 
   useEffect(() => {
@@ -37,8 +36,8 @@ export default function Week(props) {
   }
 
   useEffect(() => {
-    console.log(week);
-  }, []);
+    console.log("week row height", rowHeight);
+  }, [rowHeight]);
 
   useEffect(() => {
     const events = savedEvents.filter((event) => {
@@ -113,13 +112,15 @@ export default function Week(props) {
                   const span = endRow - startRow;
                   const dayOfWeek = dayjs(event.date).day();
 
-                  console.log("dayOfWeek", dayOfWeek);
-
                   return (
                     <div
+                      onClick={() => {
+                        setSelectedEvent(event);
+                        setShowModal(true);
+                      }}
                       key={index}
                       className={`absolute bg-${event.label}-200 
-                      p-2 mr-3 w-36 text-gray-600 rounded-md border border-white mb-1 truncate`}
+                      p-2 mr-3 w-36 cursor-pointer text-gray-600 rounded-md border border-white mb-1 truncate`}
                       style={{
                         top: `${startRow * rowHeight}px`,
                         height: `${span * rowHeight}px`,
