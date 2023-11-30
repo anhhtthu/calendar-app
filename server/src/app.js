@@ -13,7 +13,7 @@ const sendNotification = require("./services/notificationService");
 
 const ROUTES = require("./constants/routePaths");
 const eventRoutes = require("./routes/eventRoutes");
-const recurringEventRoutes = require("./routes/recurringEventRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
@@ -23,6 +23,7 @@ app.use(cors);
 app.use(responseFormat);
 
 // Routes
+app.use(ROUTES.EVENTS.BASE, authRoutes);
 app.use(ROUTES.EVENTS.BASE, eventRoutes);
 
 // Catch all unhandled routes and other errors

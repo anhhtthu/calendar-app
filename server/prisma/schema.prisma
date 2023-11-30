@@ -24,7 +24,7 @@ model Session {
   id Int @id @default(autoincrement())
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
-  token String
+  refreshToken String
   expiresAt DateTime
   createdAt DateTime @default(now())
   @@index([userId])
