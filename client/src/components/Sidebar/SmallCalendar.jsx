@@ -10,16 +10,11 @@ export default function SmallCalendar() {
 
   const [monthSmallCalendar, setMonthSmallCalendar] = useState(getMonth());
   const {
-    monthIndex,
-    trigger,
     setSmallCalendarMonth,
     selectedDate,
     setSelectedDate,
-    weekIndex,
     setWeekIndex,
-    currentView,
     setDayIndex,
-    smallCalendarMonth,
     setMonthIndex,
     setYearIndex,
     currentMonthSmallCalendarIdx,
@@ -64,8 +59,6 @@ export default function SmallCalendar() {
     setMonthIndex(day);
     setYearIndex(day.year());
   }
-
-
 
   return (
     <div className="mt-9">

@@ -10,6 +10,7 @@ export default function Day(props) {
     useContext(GlobalContext);
   const rowRef = useRef(null);
 
+  //desc: get the height of each row in the calendar to calculate the height of the event display
   useEffect(() => {
     if (rowRef.current) {
       const height = rowRef.current.getBoundingClientRect().height;
@@ -17,11 +18,20 @@ export default function Day(props) {
     }
   }, []);
 
+  //desc: filter events which match with the days in calendar, to place the event in the right row
   useEffect(() => {
-    const events = savedEvents.filter(
-      (event) =>
-        dayjs(event.date).format("DD-MM-YY") === hours[0].format("DD-MM-YY")
-    );
+    const events = savedEvents
+      .filter(
+        (event) =>
+          dayjs(event.date).format("DD-MM-YY") === hours[0].format("DD-MM-YY")
+      )
+      .map((event) => {
+        const startRow = event.startTime.hour();
+        const endRow = event.endTime.hour();
+        const span = endRow - startRow;
+
+        return { ...event, startRow, endRow, span };
+      });
     setDayEvents(events);
   }, [savedEvents, hours]);
 
@@ -53,9 +63,8 @@ export default function Day(props) {
           >
             <div>{hour.format("HH:mm")}</div>
             {dayEvents.map((event, index) => {
-              const startRow = event.startTime.hour();
-              const endRow = event.endTime.hour();
-              const span = endRow - startRow;
+              const { startRow, endRow, span } = event;
+
               console.log(startRow, endRow);
 
               return (

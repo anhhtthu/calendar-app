@@ -27,6 +27,7 @@ export default function CreateEventModal() {
     setSelectedEvent,
   } = useContext(GlobalContext);
   const [title, setTitle] = useState(selectedEvent ? selectedEvent.title : "");
+  const [collaborator, setCollaborator] = useState("");
   const [description, setDescription] = useState(
     selectedEvent ? selectedEvent.description : ""
   );
@@ -87,7 +88,6 @@ export default function CreateEventModal() {
     setSelectedEvent(null);
   };
 
-
   //desc: handle selected event type
   const handleSelectedEventType = (eventType) => {
     eventTypesDispatch({ type: "SELECTED_EVENT_TYPE", payload: eventType });
@@ -115,10 +115,12 @@ export default function CreateEventModal() {
             <header className="px-4 py-2 mt-3 flex justify-between items-center">
               <div className="flex flex-col items-start">
                 <span className="text-lg font-semibold text-gray-500">
-                  Create Schedule
+                  {`${selectedEvent ? "Update" : "Create"} Event`}
                 </span>
                 <span className="text-gray-500 text-sm">
-                  You can create event, meeting and tasks
+                  {`You can ${
+                    selectedEvent ? "update" : "create"
+                  } event, meeting and tasks`}
                 </span>
               </div>
               <button
@@ -153,6 +155,18 @@ export default function CreateEventModal() {
                     placeholder="Event Description"
                     className="border border-gray-300 rounded-md p-2"
                   ></textarea>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="title">Choose your collaborator</label>
+                  <input
+                    placeholder="Add your collaborator"
+                    type="text"
+                    name="collaborator"
+                    id="collaborator"
+                    value={collaborator}
+                    onChange={(e) => setCollaborator(e.target.value)}
+                    className="border border-gray-300 rounded-md p-2"
+                  />
                 </div>
                 <div className="flex flex-1 gap-4 justify-between">
                   <div className="flex flex-col gap-2 w-1/2">
