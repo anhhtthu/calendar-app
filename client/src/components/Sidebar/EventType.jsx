@@ -8,8 +8,13 @@ export default function EventType() {
   const [openInput, setOpenInput] = useState(false);
   const [inputEventType, setInputEventType] = useState("");
   const [updateIndex, setUpdateIndex] = useState(null);
-  const { eventTypesDispatch, totalEventTypes, savedEvent } =
-    React.useContext(GlobalContext);
+  const {
+    eventTypesDispatch,
+    totalEventTypes,
+    savedEvent,
+    setCheckedLabel,
+    checkedLabel,
+  } = React.useContext(GlobalContext);
 
   //desc: add new event type to eventTypes state
   const handleAddNewEventType = (e) => {
@@ -24,6 +29,7 @@ export default function EventType() {
       eventTypesDispatch({ type: "ADD_EVENT_TYPE", payload: inputEventType });
       setInputEventType("");
     }
+    setCheckedLabel((prevLabel) => [...prevLabel, inputEventType]);
     setInputEventType("");
   };
 
@@ -38,6 +44,20 @@ export default function EventType() {
     setOpenInput(true);
     setUpdateIndex(index);
   };
+
+  //desc: handle checkbox change, decide to add or remove the label from checkedLabel state
+  const handleCheckboxChange = (label, checked) => {
+    console.log(label, checked);
+    if (checked) {
+      setCheckedLabel((prevLabel) => [...prevLabel, label]);
+    } else {
+      setCheckedLabel((prevLabel) => prevLabel.filter((l) => l !== label));
+    }
+  };
+
+  useEffect(() => {
+    console.log("checkedLabel", checkedLabel);
+  }, [checkedLabel]);
 
   //desc: merge multiple classes into one if the option is active
   function classNames(...classes) {
@@ -97,6 +117,13 @@ export default function EventType() {
                             <input
                               defaultChecked
                               type="checkbox"
+                              // checked={checkedLabel.includes(eventType)}
+                              onChange={(e) =>
+                                handleCheckboxChange(
+                                  eventType,
+                                  e.target.checked
+                                )
+                              }
                               className="inline-block form-checkbox h-4 w-4 rounded-sm border-gray-400 text-violet-500 focus:outline-none focus:ring-0"
                             />
                             <label className="inline-block ml-2 text-gray-500  font-semibold ">

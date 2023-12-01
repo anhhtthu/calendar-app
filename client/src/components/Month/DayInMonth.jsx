@@ -44,7 +44,7 @@ export default function DayInMonth(props) {
         {isToday() && <span className={monthStyles.isToday}></span>}
       </div>
       <div
-        className="flex-1 cursor-pointer max-h-16 overflow-auto scrollbar scrollbar-thumb-gray-200 scrollbar-track-gray-10"
+        className="flex-1 cursor-pointer max-h-16 overflow-auto scrollbar scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-10"
         onClick={() => {
           setDateModal(day);
           setShowModal(true);

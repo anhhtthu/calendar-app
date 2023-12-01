@@ -80,7 +80,7 @@ export default function Week(props) {
         </motion.div>
       </div>
       <motion.div
-        className="justify-items-center pt-4 grid border mt-5  rounded-lg grid-cols-[1fr,11fr] h-[87%] overflow-auto scrollbar scrollbar-thumb-gray-200 scrollbar-track-gray-100"
+        className="justify-items-center pt-4 grid border mt-5  rounded-lg grid-cols-[1fr,11fr] h-[87%] overflow-auto scrollbar scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100"
         variants={calendarVariants(direction)}
         animate="visible"
         initial={isFirstMount ? "visible" : "hidden"}

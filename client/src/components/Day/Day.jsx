@@ -40,7 +40,7 @@ export default function Day(props) {
         <span className="text-xs">{hours[0].format("dddd")}</span>
         <span className="text-4xl font-semibold">{hours[0].format("DD")}</span>
       </div>
-      <div className=" gap-2 relative overflow-auto h-[560px] m-2 border px-4 rounded-md scrollbar scrollbar-thumb-gray-200 scrollbar-track-gray-100">
+      <div className=" gap-2 relative overflow-auto h-[560px] m-2 border px-4 rounded-md scrollbar scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
         {hours.map((hour, index) => (
           <div
             key={index}
