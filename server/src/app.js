@@ -14,11 +14,8 @@ const sendNotification = require("./services/notificationService");
 const ROUTES = require("./constants/routePaths");
 const eventRoutes = require("./routes/eventRoutes");
 const authRoutes = require("./routes/authRoutes");
-<<<<<<< HEAD
-const calendarRoutes = require("./routes/calendarRoutes");
-=======
 const userRoutes = require("./routes/userRoutes");
->>>>>>> origin/developing
+const calendarRoutes = require("./routes/calendarRoutes");
 
 const app = express();
 

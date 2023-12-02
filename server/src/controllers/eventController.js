@@ -8,12 +8,8 @@ const { validateEventInput } = require("../services/eventServiceHelpers");
 
 exports.createEvent = async (req, res, next) => {
   try {
-<<<<<<< HEAD
     // const userId = 2;
     // const userId = req.user.id;
-=======
-    const userId = req.user.userId;
->>>>>>> origin/developing
     const eventData = req.body;
 
     // Validate event input

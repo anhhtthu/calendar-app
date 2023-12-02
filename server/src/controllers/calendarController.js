@@ -7,6 +7,8 @@ const { logger } = require("../utils/logger");
 // Create a new calendar for a user
 exports.createCalendar = async (req, res) => {
   try {
+    // const  userId  = req.user.id;
+
     const userId = 1;
     const { settings } = req.body;
 
@@ -23,38 +25,31 @@ exports.createCalendar = async (req, res) => {
 // Get a user's calendar
 exports.getCalendar = async (req, res) => {
   try {
-    const { userId } = req.params;
-
+    // const  userId  = req.user.id;
+    const userId = 1;
     // Find the calendar for the specified user
-    const calendar = await Calendar.findOne({ userId });
+    const calendar = await calendarService.getCalendar(userId);
 
-    if (!calendar) {
-      return res.status(404).json({ error: "Calendar not found" });
-    }
-
-    res.json(calendar);
+    res.sendData("Find calendar successfully", calendar);
   } catch (error) {
-    res.status(500).json({ error: "Failed to get calendar" });
+    logger.errorf("Error finding calendar: %v", error);
+    return res.sendError(error.status, error.errorCode, error.message);
   }
 };
 // Update a user's calendar
 exports.updateCalendar = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const { name, events } = req.body;
+    // const userId  = req.user.id;
+    const userId = 1;
+    const { settings } = req.body;
 
     // Find and update the calendar for the specified user
-    const calendar = await Calendar.findOneAndUpdate(
-      { userId },
-      { name, events },
-      { new: true }
+    const updatedCalendar = await calendarService.updateCalendar(
+      userId,
+      settings
     );
 
-    if (!calendar) {
-      return res.status(404).json({ error: "Calendar not found" });
-    }
-
-    res.json(calendar);
+    res.sendData("Update calendar successfully", updatedCalendar);
   } catch (error) {
     res.status(500).json({ error: "Failed to update calendar" });
   }
