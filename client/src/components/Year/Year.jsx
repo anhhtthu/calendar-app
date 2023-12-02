@@ -51,8 +51,8 @@ export default function Year({ year }) {
     let x = rect.right + window.scrollX;
     let y = rect.bottom + window.scrollY;
 
-    const modalWidth = modalSize.width; // Replace with your modal's width
-    const modalHeight = modalSize.height; // Replace with your modal's height
+    const modalWidth = modalSize.width; // Replace with modal's width
+    const modalHeight = modalSize.height; // Replace with modal's height
 
     // Adjust x if the modal would go out of the viewport
     if (x + modalWidth > window.innerWidth) {

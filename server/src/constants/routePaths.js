@@ -22,6 +22,7 @@ const ROUTES = {
   // Calendars Route
   CALENDARS: {
     BASE: `${BASE_URL}/calendars`,
+    CREATE: "/",
   },
 
   // Events Route

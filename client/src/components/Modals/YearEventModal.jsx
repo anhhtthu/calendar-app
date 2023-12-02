@@ -94,7 +94,7 @@ export default function YearEventModal(props) {
           ))
         ) : (
           <p className="text-gray-500 text-xs mt-4">
-            You don't have any event today
+            You don't have any event on this day
           </p>
         )}
       </motion.div>

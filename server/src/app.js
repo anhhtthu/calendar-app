@@ -14,6 +14,7 @@ const sendNotification = require("./services/notificationService");
 const ROUTES = require("./constants/routePaths");
 const eventRoutes = require("./routes/eventRoutes");
 const authRoutes = require("./routes/authRoutes");
+const calendarRoutes = require("./routes/calendarRoutes");
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use(responseFormat);
 // Routes
 app.use(ROUTES.EVENTS.BASE, authRoutes);
 app.use(ROUTES.EVENTS.BASE, eventRoutes);
+app.use(ROUTES.CALENDARS.BASE, calendarRoutes);
 
 // Catch all unhandled routes and other errors
 app.use((req, res, next) => {
