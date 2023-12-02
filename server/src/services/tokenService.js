@@ -6,15 +6,17 @@ const ERROR_CODE = require("../constants/errorCode");
 const moment = require("moment");
 
 exports.generateAccessToken = async (userId) => {
-  return jwt.sign({ userId }, config.jwt_secret, {
-    expiresIn: config.expires_token,
+  const accessToken = jwt.sign({ userId }, config.jwt_secret, {
+    expiresIn: config.expires_access_token,
   });
+  return accessToken;
 };
 
 exports.generateRefreshToken = async (userId) => {
-  return jwt.sign({ userId }, config.refresh_token_secret, {
+  const refreshToken = jwt.sign({ userId }, config.refresh_token_secret, {
     expiresIn: config.expires_refresh_token,
   });
+  return refreshToken;
 };
 
 exports.storedRefreshToken = async (userId, refreshToken) => {
@@ -29,7 +31,7 @@ exports.storedRefreshToken = async (userId, refreshToken) => {
 };
 
 exports.verifyRefreshToken = async (refreshToken) => {
-  const session = await prisma.session.findUnique({
+  const session = await prisma.session.findFirst({
     where: { refreshToken: refreshToken },
   });
 
@@ -45,7 +47,19 @@ exports.verifyRefreshToken = async (refreshToken) => {
 };
 
 exports.invalidateToken = async (refreshToken) => {
-  await prisma.session.delete({
+  const session = await prisma.session.findFirst({
     where: { refreshToken: refreshToken },
+  });
+
+  if (!session) {
+    throw new CustomError(
+      400,
+      ERROR_CODE.TOKEN_NOTFOUND,
+      "Refresh Token not found"
+    );
+  }
+
+  await prisma.session.delete({
+    where: { id: session.id, refreshToken: refreshToken },
   });
 };

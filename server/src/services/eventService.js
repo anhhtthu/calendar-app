@@ -9,6 +9,7 @@ const {
   calculateReminderTime,
 } = require("./eventServiceHelpers");
 const recurringEventService = require("./recurringEventService");
+const EVENT_ENUM = require("../constants/eventEnum");
 
 // CREATE EVENT LOGIC
 exports.createEvent = async (userId, eventData) => {
@@ -71,6 +72,8 @@ exports.createEvent = async (userId, eventData) => {
   });
 
   // Handle recurring events
+  isRecurring = isRecurring !== undefined ? isRecurring : false;
+  recurringDetails = recurringDetails !== undefined ? recurringDetails : null;
   if (isRecurring && recurringDetails) {
     await recurringEventService.createRecurringEvent(
       mainEvent,

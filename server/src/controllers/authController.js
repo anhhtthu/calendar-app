@@ -1,6 +1,7 @@
 const ERROR_CODE = require("../constants/errorCode");
 const CustomError = require("../utils/customError");
 const { logger } = require("../utils/logger");
+const bcrypt = require("bcrypt");
 
 const tokenService = require("../services/tokenService");
 const userService = require("../services/userService");
@@ -50,7 +51,7 @@ exports.refreshToken = async (req, res, next) => {
   try {
     const { userId } = await tokenService.verifyRefreshToken(refreshToken);
 
-    const newAccessToken = tokenService.generateAccessToken(userId);
+    const newAccessToken = await tokenService.generateAccessToken(userId);
 
     res.sendData("Refreshing token successfully", {
       accessToken: newAccessToken,
@@ -62,10 +63,10 @@ exports.refreshToken = async (req, res, next) => {
 };
 
 exports.invalidateToken = async (req, res, next) => {
-  const token = req.body.token;
+  const token = req.body.refreshToken;
   try {
     await tokenService.invalidateToken(token);
-    res.sendData("Token validated");
+    res.sendData("Revoke token successfully");
   } catch (error) {
     logger.errorf("Error invalidating token: %v", error);
     res.sendError(error.status, error.errorCode, error.message);

@@ -6,6 +6,7 @@ const ROUTES = {
   // Authentication Route
   AUTH: {
     BASE: `${BASE_URL}/auth`,
+    REGISTER: "/register",
     LOGIN: "/login",
     LOGOUT: "/logout",
     REFRESH_TOKEN: "/refresh-token",
@@ -16,7 +17,7 @@ const ROUTES = {
     BASE: `${BASE_URL}/users`,
     GET: "/profile",
     PUT: "/profile",
-    POST: "/register",
+    PASSWORD: "/update-password",
   },
 
   // Calendars Route

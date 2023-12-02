@@ -14,7 +14,11 @@ const sendNotification = require("./services/notificationService");
 const ROUTES = require("./constants/routePaths");
 const eventRoutes = require("./routes/eventRoutes");
 const authRoutes = require("./routes/authRoutes");
+<<<<<<< HEAD
 const calendarRoutes = require("./routes/calendarRoutes");
+=======
+const userRoutes = require("./routes/userRoutes");
+>>>>>>> origin/developing
 
 const app = express();
 
@@ -24,7 +28,8 @@ app.use(cors);
 app.use(responseFormat);
 
 // Routes
-app.use(ROUTES.EVENTS.BASE, authRoutes);
+app.use(ROUTES.AUTH.BASE, authRoutes);
+app.use(ROUTES.USER.BASE, userRoutes);
 app.use(ROUTES.EVENTS.BASE, eventRoutes);
 app.use(ROUTES.CALENDARS.BASE, calendarRoutes);
 
