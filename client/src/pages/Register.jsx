@@ -20,6 +20,22 @@ export default function Register() {
     });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const response = await fetch('http://localhost:3000/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData.user)
+    });
+
+    const data = await response.json();
+
+    // handle response data
+  };
+
   return (
     <figure className="h-screen flex bg-gray-100">
       <div className="w-full max-w-md m-auto bg-white rounded-lg border border-primaryBorder shadow-default py-10 px-1">
@@ -32,7 +48,7 @@ export default function Register() {
               Register a new account
             </h1>
           </div>
-          <form>
+          <form onSubmit={handleSubmit}>
             <label>Email:</label>
             <input
               name="email"
@@ -82,6 +98,7 @@ export default function Register() {
                 className={
                   "bg-blue-700 hover:bg-blue-500 py-2 px-4 text-md text-white rounded border border-blue focus:outline-none focus:border-black"
                 }
+                type="submit"
                 value="Register"
               >
                 Register
