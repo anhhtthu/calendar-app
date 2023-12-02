@@ -23,7 +23,7 @@ app.use(cors);
 app.use(responseFormat);
 
 // Routes
-app.use(ROUTES.EVENTS.BASE, authRoutes);
+app.use(ROUTES.AUTH.BASE, authRoutes);
 app.use(ROUTES.EVENTS.BASE, eventRoutes);
 
 // Catch all unhandled routes and other errors

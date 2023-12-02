@@ -19,7 +19,7 @@ exports.validateUserCredentials = async (usernameOrEmail, password) => {
     throw new CustomError(
       401,
       ERROR_CODE.CREDENTIALS_INVALID,
-      "Invalid credentials"
+      "Invalid Password"
     );
   }
 
