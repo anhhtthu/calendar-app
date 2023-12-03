@@ -41,12 +41,13 @@ exports.updateCalendar = async (req, res) => {
   try {
     // const userId  = req.user.id;
     const userId = 1;
-    const { settings } = req.body;
-
+    const { totalEventTypes } = req.body;
+    console.log("check the totalEventTypes data", totalEventTypes);
+    // const eventTypes = ["my calendar", "something"];
     // Find and update the calendar for the specified user
     const updatedCalendar = await calendarService.updateCalendar(
       userId,
-      settings
+      totalEventTypes
     );
 
     res.sendData("Update calendar successfully", updatedCalendar);

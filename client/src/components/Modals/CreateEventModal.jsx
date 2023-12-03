@@ -33,6 +33,9 @@ export default function CreateEventModal() {
   );
   const currentTime = dateModal.startOf("hour").format("HH:mm");
   const currentDate = dateModal.format("YYYY-MM-DD");
+  const [selectedEventType, setSelectedEventType] = useState(
+    selectedEvent ? selectedEvent.selectedEventType : "My calendar"
+  );
   const [startTime, setStartTime] = useState(
     selectedEvent ? selectedEvent.startTime.format("HH:mm") : currentTime
   );
@@ -76,7 +79,7 @@ export default function CreateEventModal() {
       startTime: startTimeDayjs,
       endTime: endTimeDayjs,
       label: selectedLabel,
-      totalEventTypes,
+      selectedEventType,
     };
     saveCalendarEvents([...savedEvents, newEvent]);
     if (selectedEvent) {
@@ -89,9 +92,9 @@ export default function CreateEventModal() {
   };
 
   //desc: handle selected event type
-  const handleSelectedEventType = (eventType) => {
-    eventTypesDispatch({ type: "SELECTED_EVENT_TYPE", payload: eventType });
-  };
+  // const handleSelectedEventType = (eventType) => {
+  //   eventTypesDispatch({ type: "SELECTED_EVENT_TYPE", payload: eventType });
+  // };
 
   //desc: merge multiple classes into one if the option is active
   function classNames(...classes) {
@@ -180,22 +183,6 @@ export default function CreateEventModal() {
                   </div>
                   <div className="flex flex-col gap-2 w-1/2">
                     <label htmlFor="time">Time</label>
-                    {/* <div className="flex flex-row gap-2 justify-center">
-                      <input
-                        type="time"
-                        value={startTime}
-                        onChange={(e) => setStartTime(e.target.value)}
-                        className="border border-gray-300 rounded-md p-2"
-                      />
-
-                      <input
-                        type="time"
-                        value={endTime}
-                        onChange={(e) => setEndTime(e.target.value)}
-                        min={startTime}
-                        className="border border-gray-300 rounded-md p-2"
-                      />
-                    </div> */}
                     <div className="flex flex-1 flex-row gap-2 justify-center relative">
                       <Listbox value={startTime} onChange={setStartTime}>
                         <Listbox.Button className="border border-gray-300 rounded-md w-1/2">
@@ -251,9 +238,9 @@ export default function CreateEventModal() {
                     <label htmlFor="">Choose your event type</label>
                     <div className="w-1/2">
                       <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2  text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                        {totalEventTypes.selectedEventType
-                          ? totalEventTypes.selectedEventType
-                          : "Select your event type"}
+                        {!selectedEventType
+                          ? totalEventTypes[0]
+                          : selectedEventType}
                         <ChevronDownIcon
                           className="-mr-1 h-5 w-5 text-gray-400 mt-1"
                           aria-hidden="true"
@@ -270,27 +257,23 @@ export default function CreateEventModal() {
                       leaveTo="transform opacity-0 scale-95"
                     >
                       <Menu.Items className="absolute top-8 right-0 z-10 mt-2 w-1/2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        {totalEventTypes?.eventTypes?.map(
-                          (eventType, index) => (
-                            <Menu.Item key={index}>
-                              {({ active }) => (
-                                <span
-                                  onClick={() =>
-                                    handleSelectedEventType(eventType)
-                                  }
-                                  className={classNames(
-                                    active
-                                      ? "bg-gray-100 text-gray-900"
-                                      : "text-gray-700",
-                                    "block px-4 py-2"
-                                  )}
-                                >
-                                  {eventType}
-                                </span>
-                              )}
-                            </Menu.Item>
-                          )
-                        )}
+                        {totalEventTypes.map((eventType, index) => (
+                          <Menu.Item key={index}>
+                            {({ active }) => (
+                              <span
+                                onClick={() => setSelectedEventType(eventType)}
+                                className={classNames(
+                                  active
+                                    ? "bg-gray-100 text-gray-900"
+                                    : "text-gray-700",
+                                  "block px-4 py-2"
+                                )}
+                              >
+                                {eventType}
+                              </span>
+                            )}
+                          </Menu.Item>
+                        ))}
                       </Menu.Items>
                     </Transition>
                   </Menu>

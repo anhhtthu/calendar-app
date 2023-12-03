@@ -4,20 +4,17 @@ import { ChevronUpIcon, PlusIcon } from "@heroicons/react/solid";
 import GlobalContext from "../../context/GlobalContext";
 import { Menu, Transition } from "@headlessui/react";
 import { DotsVerticalIcon } from "@heroicons/react/outline";
+import { calendarUpdate } from "../../services/calendarService";
 export default function EventType() {
   const [openInput, setOpenInput] = useState(false);
   const [inputEventType, setInputEventType] = useState("");
   const [updateIndex, setUpdateIndex] = useState(null);
-  const {
-    eventTypesDispatch,
-    totalEventTypes,
-    savedEvent,
-    setCheckedLabel,
-    checkedLabel,
-  } = React.useContext(GlobalContext);
+  const [shouldUpdate, setShouldUpdate] = useState(false);
+  const { eventTypesDispatch, totalEventTypes, setCheckedLabel, checkedLabel } =
+    React.useContext(GlobalContext);
 
   //desc: add new event type to eventTypes state
-  const handleAddNewEventType = (e) => {
+  const handleAddNewEventType = async (e) => {
     e.preventDefault();
     if (updateIndex !== null) {
       eventTypesDispatch({
@@ -31,12 +28,29 @@ export default function EventType() {
     }
     setCheckedLabel((prevLabel) => [...prevLabel, inputEventType]);
     setInputEventType("");
+    setShouldUpdate(true);
   };
 
   //desc: remove event type from eventTypes state
   const handleRemoveEventType = (eventType) => {
     eventTypesDispatch({ type: "REMOVE_EVENT_TYPE", payload: eventType });
+    setShouldUpdate(true);
   };
+
+  //desc: update event type to database
+  useEffect(() => {
+    const updateCalendarToServer = async () => {
+      try {
+        const res = await calendarUpdate(totalEventTypes);
+        console.log("calendar data send to server", res);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (shouldUpdate) {
+      updateCalendarToServer();
+    }
+  }, [shouldUpdate]);
 
   //desc: update event type from eventTypes state
   const handleUpdateEventType = (eventType, index) => {
@@ -110,14 +124,13 @@ export default function EventType() {
                   </form>
 
                   <div className="mt-5 flex flex-col">
-                    {totalEventTypes.eventTypes.map((eventType, index) => (
+                    {totalEventTypes?.map((eventType, index) => (
                       <Menu as="div" key={index} className="relative group">
                         <div className="flex justify-between justify-between items-center py-2 px-1 hover:bg-gray-100">
                           <div className="flex items-center">
                             <input
                               defaultChecked
                               type="checkbox"
-                              // checked={checkedLabel.includes(eventType)}
                               onChange={(e) =>
                                 handleCheckboxChange(
                                   eventType,

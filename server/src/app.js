@@ -19,9 +19,9 @@ const calendarRoutes = require("./routes/calendarRoutes");
 
 const app = express();
 
+app.use(cors);
 app.use(bodyParser);
 app.use(logRequest);
-app.use(cors);
 app.use(responseFormat);
 
 // Routes

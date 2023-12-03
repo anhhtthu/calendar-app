@@ -1,5 +1,6 @@
 import React from "react";
-import { ROUTES } from "../constants/routePaths";
+import { ROUTES } from "../constant/apiPath";
+import axios from "axios";
 
 const handleErrors = (error) => {
   if (error.response) {
@@ -14,7 +15,7 @@ const handleErrors = (error) => {
 
 export const calendarCreate = async (payload) => {
   try {
-    const response = await fetch(ROUTES.CALENDAR.CREATE, {
+    const response = await fetch(ROUTES.CALENDARS.BASE, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -23,6 +24,35 @@ export const calendarCreate = async (payload) => {
       withCredentials: true,
     });
     return response.data;
+  } catch (error) {
+    handleErrors(error);
+  }
+};
+export const calendarGet = async () => {
+  try {
+    const response = await axios.get("http://localhost:3001/api/v1/calendars", {
+      withCredentials: true,
+      headers: {
+        "Cache-Control": "no-cache",
+      },
+    });
+    return response.data.data;
+  } catch (error) {
+    handleErrors(error);
+  }
+};
+
+export const calendarUpdate = async (eventTypes) => {
+  try {
+    const response = await axios.put(
+      ROUTES.CALENDARS.BASE,
+      { totalEventTypes: eventTypes },
+      {
+        withCredentials: true,
+      }
+    );
+    // console.log(response);
+    return response.data.data;
   } catch (error) {
     handleErrors(error);
   }

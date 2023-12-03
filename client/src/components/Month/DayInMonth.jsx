@@ -25,10 +25,6 @@ export default function DayInMonth(props) {
     return dayjs().isSame(day, "month");
   }
 
-  useEffect(() => {
-    console.log(savedEvents);
-  }, [savedEvents]);
-
   return (
     <div
       className={`border ${
