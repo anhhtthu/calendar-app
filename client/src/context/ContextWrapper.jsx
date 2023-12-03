@@ -27,6 +27,7 @@ export default function ContextWrapper({ children }) {
   const [direction, setDirection] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isWarning, setIsWarning] = useState(false);
+  const [calendarId, setCalendarId] = useState(null);
   // const [eventType, setEventType] = useState("");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [currentMonthSmallCalendarIdx, setCurrentMonthSmallCalendarIdx] =
@@ -62,9 +63,7 @@ export default function ContextWrapper({ children }) {
   //filter savedEvents state based on checkedLabel
   useEffect(() => {
     setFilteredEvents(
-      savedEvents.filter((event) =>
-        checkedLabel.includes(event.selectedEventType)
-      )
+      savedEvents.filter((event) => checkedLabel.includes(event.eventType))
     );
   }, [checkedLabel, savedEvents]);
 
@@ -115,9 +114,10 @@ export default function ContextWrapper({ children }) {
         if (response) {
           eventTypesDispatch({
             type: "INITIAL_EVENT_TYPE",
-            payload: response.settings.totalEventTypes,
+            payload: response.data.settings.totalEventTypes,
           });
-          setCheckedLabel(response.settings.totalEventTypes);
+          setCheckedLabel(response.data.settings.totalEventTypes);
+          setCalendarId(response.data.id);
         }
       } catch (error) {
         // console.log(error);
@@ -196,6 +196,7 @@ export default function ContextWrapper({ children }) {
         setCurrentMonthSmallCalendarIdx,
         setCheckedLabel,
         checkedLabel,
+        calendarId,
       }}
     >
       {children}

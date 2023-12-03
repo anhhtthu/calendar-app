@@ -36,7 +36,7 @@ export const calendarGet = async () => {
         "Cache-Control": "no-cache",
       },
     });
-    return response.data.data;
+    return response.data;
   } catch (error) {
     handleErrors(error);
   }

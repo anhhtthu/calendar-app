@@ -45,6 +45,8 @@ exports.createEvent = async (userId, eventData) => {
   startTime = new Date(startTime);
   endTime = new Date(endTime);
 
+  console.log("check the start time", startTime);
+
   // handle all day events
   if (allDay) {
     startTime = new Date(startTime.setHours(0, 0, 0, 0));

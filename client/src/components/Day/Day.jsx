@@ -1,8 +1,10 @@
 import React, { useContext, useEffect, useState, useRef } from "react";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import GlobalContext from "../../context/GlobalContext";
 
 export default function Day(props) {
+  dayjs.extend(utc);
   const { hours } = { ...props };
   const [dayEvents, setDayEvents] = useState([]);
   const [rowHeight, setRowHeight] = useState(0);
@@ -26,18 +28,14 @@ export default function Day(props) {
           dayjs(event.date).format("DD-MM-YY") === hours[0].format("DD-MM-YY")
       )
       .map((event) => {
-        const startRow = event.startTime.hour();
-        const endRow = event.endTime.hour();
+        const startRow = dayjs.utc(event.startTime).local().hour();
+        const endRow = dayjs.utc(event.endTime).local().hour();
         const span = endRow - startRow;
 
         return { ...event, startRow, endRow, span };
       });
     setDayEvents(events);
   }, [savedEvents, hours]);
-
-  useEffect(() => {
-    console.log("dayEvent", dayEvents);
-  }, [dayEvents]);
 
   //set the date for the created event when click to a specific hour in the calendar
   const handleTimeEvent = (hour) => {
@@ -65,22 +63,24 @@ export default function Day(props) {
             {dayEvents.map((event, index) => {
               const { startRow, endRow, span } = event;
 
-              console.log(startRow, endRow);
-
               return (
                 <div
                   onClick={() => setSelectedEvent(event)}
                   key={index}
-                  className={`bg-${event.label}-200 ml-20 z-10 w-11/12 absolute p-2 mr-3 cursor-pointer text-gray-500 rounded-md border border-white mb-1 truncate`}
+                  className={`bg-${event.color}-200 ml-20 z-10 w-11/12 absolute p-2 mr-3 cursor-pointer text-gray-500 rounded-md border border-white mb-1 truncate`}
                   style={{
                     top: `${startRow * rowHeight}px`,
                     height: `${span * rowHeight}px`,
                   }}
                 >
                   <p className="text-sm font-semibold">{event.title}</p>
-                  <p className="text-xs mt-1">{` ${event.startTime.format(
-                    "HH:mm"
-                  )} - ${event.endTime.format("HH:mm")}`}</p>
+                  <p className="text-xs mt-1">{` ${dayjs
+                    .utc(event.startTime)
+                    .local()
+                    .format("HH:mm")} - ${dayjs
+                    .utc(event.endTime)
+                    .local()
+                    .format("HH:mm")}`}</p>
                 </div>
               );
             })}

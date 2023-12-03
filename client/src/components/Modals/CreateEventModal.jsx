@@ -6,11 +6,14 @@ import { BsCheck } from "react-icons/bs";
 import GlobalContext from "../../context/GlobalContext";
 import { Menu, Transition, Listbox } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
-import { saveCalendarEvents } from "../../services/eventServices";
+import { createEvent, updateEvent } from "../../services/eventServices";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import { calendarCreate } from "../../services/calendarService";
 
 dayjs.extend(customParseFormat);
+dayjs.extend(utc);
 
 export default function CreateEventModal() {
   const {
@@ -22,10 +25,12 @@ export default function CreateEventModal() {
     totalEventTypes,
     eventTypesDispatch,
     setIsWarning,
+    calendarId,
     isWarning,
     selectedEvent,
     setSelectedEvent,
   } = useContext(GlobalContext);
+  const [location, setLocation] = useState("");
   const [title, setTitle] = useState(selectedEvent ? selectedEvent.title : "");
   const [collaborator, setCollaborator] = useState("");
   const [description, setDescription] = useState(
@@ -33,17 +38,21 @@ export default function CreateEventModal() {
   );
   const currentTime = dateModal.startOf("hour").format("HH:mm");
   const currentDate = dateModal.format("YYYY-MM-DD");
-  const [selectedEventType, setSelectedEventType] = useState(
-    selectedEvent ? selectedEvent.selectedEventType : "My calendar"
+  const [eventType, setEventType] = useState(
+    selectedEvent ? selectedEvent.eventType : "My calendar"
   );
   const [startTime, setStartTime] = useState(
-    selectedEvent ? selectedEvent.startTime.format("HH:mm") : currentTime
+    selectedEvent
+      ? dayjs.utc(selectedEvent.startTime).local().format("HH:mm")
+      : currentTime
   );
   const [chosenDate, setChosenDate] = useState(
     selectedEvent ? selectedEvent.date : currentDate
   );
   const [endTime, setEndTime] = useState(
-    selectedEvent ? selectedEvent.endTime.format("HH:mm") : currentTime
+    selectedEvent
+      ? dayjs.utc(selectedEvent.endTime).local().format("HH:mm")
+      : currentTime
   );
 
   const hours = Array.from({ length: 24 }, (_, i) =>
@@ -65,7 +74,7 @@ export default function CreateEventModal() {
   );
 
   //desc: handle submit event
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     //convert time to dayjs
@@ -73,23 +82,32 @@ export default function CreateEventModal() {
     const endTimeDayjs = dayjs(endTime, "HH:mm");
 
     const newEvent = {
-      title,
-      description,
+      calendarId: calendarId,
+      title: title,
+      description: description,
+      location: "vietnam",
       date: chosenDate,
       startTime: startTimeDayjs,
       endTime: endTimeDayjs,
-      label: selectedLabel,
-      selectedEventType,
+      color: selectedLabel,
+      eventType: eventType,
     };
-    saveCalendarEvents([...savedEvents, newEvent]);
     if (selectedEvent) {
-      dispatchCalendarEvent({ type: "UPDATE_EVENT", payload: newEvent });
+      const res = await updateEvent(newEvent, selectedEvent.id);
+      dispatchCalendarEvent({ type: "UPDATE_EVENT", payload: res.data });
+      console.log("update event", res);
     } else {
-      dispatchCalendarEvent({ type: "CREATE_EVENT", payload: newEvent });
+      const res = await createEvent(newEvent);
+      dispatchCalendarEvent({ type: "CREATE_EVENT", payload: res.data });
+      // const realTime = dayjs.utc(res.data.startTime);
     }
     setShowModal(false);
     setSelectedEvent(null);
   };
+
+  useEffect(() => {
+    console.log("selectedEvent", selectedEvent);
+  }, [selectedEvent]);
 
   //desc: handle selected event type
   // const handleSelectedEventType = (eventType) => {
@@ -238,9 +256,7 @@ export default function CreateEventModal() {
                     <label htmlFor="">Choose your event type</label>
                     <div className="w-1/2">
                       <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2  text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                        {!selectedEventType
-                          ? totalEventTypes[0]
-                          : selectedEventType}
+                        {!eventType ? totalEventTypes[0] : eventType}
                         <ChevronDownIcon
                           className="-mr-1 h-5 w-5 text-gray-400 mt-1"
                           aria-hidden="true"
@@ -257,11 +273,11 @@ export default function CreateEventModal() {
                       leaveTo="transform opacity-0 scale-95"
                     >
                       <Menu.Items className="absolute top-8 right-0 z-10 mt-2 w-1/2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        {totalEventTypes.map((eventType, index) => (
+                        {totalEventTypes.map((evt, index) => (
                           <Menu.Item key={index}>
                             {({ active }) => (
                               <span
-                                onClick={() => setSelectedEventType(eventType)}
+                                onClick={() => setEventType(evt)}
                                 className={classNames(
                                   active
                                     ? "bg-gray-100 text-gray-900"
@@ -269,7 +285,7 @@ export default function CreateEventModal() {
                                   "block px-4 py-2"
                                 )}
                               >
-                                {eventType}
+                                {evt}
                               </span>
                             )}
                           </Menu.Item>

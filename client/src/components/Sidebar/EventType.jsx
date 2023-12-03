@@ -10,12 +10,16 @@ export default function EventType() {
   const [inputEventType, setInputEventType] = useState("");
   const [updateIndex, setUpdateIndex] = useState(null);
   const [shouldUpdate, setShouldUpdate] = useState(false);
+  const [remindInput, setRemindInput] = useState(false);
   const { eventTypesDispatch, totalEventTypes, setCheckedLabel, checkedLabel } =
     React.useContext(GlobalContext);
 
   //desc: add new event type to eventTypes state
   const handleAddNewEventType = async (e) => {
     e.preventDefault();
+
+    if (inputEventType === "") return setRemindInput(true);
+
     if (updateIndex !== null) {
       eventTypesDispatch({
         type: "UPDATE_EVENT_TYPE",
@@ -29,6 +33,7 @@ export default function EventType() {
     setCheckedLabel((prevLabel) => [...prevLabel, inputEventType]);
     setInputEventType("");
     setShouldUpdate(true);
+    setRemindInput(false);
   };
 
   //desc: remove event type from eventTypes state
@@ -50,7 +55,7 @@ export default function EventType() {
     if (shouldUpdate) {
       updateCalendarToServer();
     }
-  }, [shouldUpdate]);
+  }, [shouldUpdate, totalEventTypes]);
 
   //desc: update event type from eventTypes state
   const handleUpdateEventType = (eventType, index) => {
@@ -122,6 +127,11 @@ export default function EventType() {
                       <PlusIcon className=" w-1/2 p-1 text-gray-500 hover:bg-gray-200 rounded-full" />
                     </button>
                   </form>
+                  {remindInput && (
+                    <p className="text-rose-500 text-xs mt-2 ml-2  italic">
+                      *Event type cannot be empty
+                    </p>
+                  )}
 
                   <div className="mt-5 flex flex-col">
                     {totalEventTypes?.map((eventType, index) => (

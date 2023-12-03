@@ -48,7 +48,7 @@ export default function DayInMonth(props) {
       >
         {monthEvents.map((event, index) => (
           <div
-            className={`bg-${event.label}-200 p-1 mr-3 text-xs text-gray-600 rounded mb-1 truncate`}
+            className={`bg-${event.color}-200 p-1 mr-3 text-xs text-gray-600 rounded mb-1 truncate`}
             key={index}
             onClick={() => setSelectedEvent(event)}
           >

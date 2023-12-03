@@ -4,7 +4,9 @@ import { calendarVariants } from "../../animations/calendarVariants";
 import GlobalContext from "../../context/GlobalContext";
 import HourInDayWeek from "./HourInDayWeek";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 export default function Week(props) {
+  dayjs.extend(utc);
   const { week } = { ...props };
   const { direction, weekIndex, savedEvents, setSelectedEvent, setShowModal } =
     useContext(GlobalContext);
@@ -107,8 +109,8 @@ export default function Week(props) {
               {weekEvents
                 // .filter((event) => dayjs(event.date).day() === dayIndex)
                 .map((event, index) => {
-                  const startRow = event.startTime.hour();
-                  const endRow = event.endTime.hour();
+                  const startRow = dayjs.utc(event.startTime).local().hour();
+                  const endRow = dayjs.utc(event.endTime).local().hour();
                   const span = endRow - startRow;
                   const dayOfWeek = dayjs(event.date).day();
 
@@ -119,7 +121,7 @@ export default function Week(props) {
                         setShowModal(true);
                       }}
                       key={index}
-                      className={`absolute bg-${event.label}-200 
+                      className={`absolute bg-${event.color}-200 
                       p-2 mr-3 w-36 cursor-pointer text-gray-600 rounded-md border border-white mb-1 truncate`}
                       style={{
                         top: `${startRow * rowHeight}px`,
@@ -128,9 +130,9 @@ export default function Week(props) {
                       }}
                     >
                       <p className="text-sm font-semibold">{event.title}</p>
-                      <p className="text-xs mt-1">{` ${event.startTime.format(
+                      <p className="text-xs mt-1">{` ${dayjs.utc(event.startTime).local().format(
                         "HH:mm"
-                      )} - ${event.endTime.format("HH:mm")}`}</p>
+                      )} - ${dayjs.utc(event.endTime).local().format("HH:mm")}`}</p>
                     </div>
                   );
                 })}
