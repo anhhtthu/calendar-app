@@ -51,7 +51,7 @@ export default function CreateEventModal() {
   }, [endTime]);
 
   //list of label color for event
-  const labelClasses = ["indigo", "gray", "green", "blue", "rose", "purple"];
+  const labelClasses = ["violet", "gray", "green", "blue", "rose", "purple"];
 
   //choose what label for the event
   const [selectedLabel, setSelectedLabel] = useState(

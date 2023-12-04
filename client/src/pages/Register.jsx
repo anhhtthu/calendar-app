@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
+import axios from "axios";
 
 export default function Register() {
   const [formData, setFormData] = useState({ 
@@ -23,22 +24,24 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch('http://localhost:3000/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData.user)
-    });
+    try {
+      const response = await axios.post('http://localhost:3000/register', formData.user, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
-    const data = await response.json();
-
-    // handle response data
+      if (response.status === 200) {
+        Navigate('/login'); 
+      }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
   };
 
   return (
     <figure className="h-screen flex bg-gray-100">
-      <div className="w-full max-w-md m-auto bg-white rounded-lg border border-primaryBorder shadow-default py-10 px-1">
+      <div className="w-full max-w-md m-auto bg-white rounded-lg border border-primaryBorder shadow-md py-10 px-1">
         <blockquote className="text-2xl font-medium text-center">
         </blockquote>
         
