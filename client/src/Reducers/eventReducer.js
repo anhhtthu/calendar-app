@@ -22,33 +22,24 @@ export function eventTypesReducer(totalEventTypes, { type, payload }) {
     case "INITIAL_EVENT_TYPE":
       return payload;
     case "ADD_EVENT_TYPE":
-      if (totalEventTypes.eventTypes.length < 5) {
-        return {
-          ...totalEventTypes,
-          eventTypes: [...totalEventTypes.eventTypes, payload],
-        };
+      if (totalEventTypes.length < 5) {
+        return [...totalEventTypes, payload];
       } else {
         alert("You can only have 5 event types");
         return totalEventTypes;
       }
-    case "SET_NEW_EVENT_TYPE":
-      return { ...totalEventTypes, newEventType: payload };
-    case "SELECTED_EVENT_TYPE":
-      return { ...totalEventTypes, selectedEventType: payload };
+    // case "SET_NEW_EVENT_TYPE":
+    //   return { ...totalEventTypes, newEventType: payload };
+    // case "SELECTED_EVENT_TYPE":
+    //   return { ...totalEventTypes, selectedEventType: payload };
     case "UPDATE_EVENT_TYPE":
-      return {
-        ...totalEventTypes,
-        eventTypes: totalEventTypes.eventTypes.map((evt, i) =>
+      return [
+        ...totalEventTypes.map((evt, i) =>
           i === payload.index ? payload.eventType : evt
         ),
-      };
+      ];
     case "REMOVE_EVENT_TYPE":
-      return {
-        ...totalEventTypes,
-        eventTypes: totalEventTypes.eventTypes.filter(
-          (eventType) => eventType !== payload
-        ),
-      };
+      return [...totalEventTypes.filter((eventType) => eventType !== payload)];
     default:
       return totalEventTypes;
   }

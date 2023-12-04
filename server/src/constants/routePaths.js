@@ -3,15 +3,27 @@ const config = require("../configs/config");
 const BASE_URL = config.base_url;
 
 const ROUTES = {
-  // User Authentication Route
+  // Authentication Route
   AUTH: {
     BASE: `${BASE_URL}/auth`,
-    LOGIN: `/login`,
+    REGISTER: "/register",
+    LOGIN: "/login",
+    LOGOUT: "/logout",
+    REFRESH_TOKEN: "/refresh-token",
+  },
+
+  // User Route
+  USER: {
+    BASE: `${BASE_URL}/users`,
+    GET: "/profile",
+    PUT: "/profile",
+    PASSWORD: "/update-password",
   },
 
   // Calendars Route
   CALENDARS: {
     BASE: `${BASE_URL}/calendars`,
+    CREATE: "/",
   },
 
   // Events Route

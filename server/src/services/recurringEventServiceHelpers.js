@@ -15,11 +15,11 @@ exports.getNextOccurrence = (currentDate, pattern) => {
       break;
 
     case EVENT_ENUM.RECURRING_PATTERN.MONTHLY:
-      nextDate.setDate(nextDate.getMonth() + 1);
+      nextDate.setMonth(nextDate.getMonth() + 1);
       break;
 
     case EVENT_ENUM.RECURRING_PATTERN.YEARLY:
-      nextDate.setDate(nextDate.getFullYear() + 1);
+      nextDate.setFullYear(nextDate.getFullYear() + 1);
       break;
 
     default:

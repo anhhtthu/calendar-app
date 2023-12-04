@@ -1,15 +1,15 @@
 const { logger } = require("../utils/logger");
 const eventService = require("../services/eventService");
 const {
-  validateEventInput,
   setupEventReminder,
   processInvitees,
-} = require("../services/eventServiceHelpers");
+} = require("../services/eventService");
+const { validateEventInput } = require("../services/eventServiceHelpers");
 
 exports.createEvent = async (req, res, next) => {
   try {
-    // const userId = 2;
-    const userId = req.user.id;
+    const userId = 1;
+    // const userId = req.user.userId;
     const eventData = req.body;
 
     // Validate event input
@@ -40,8 +40,7 @@ exports.listEvents = async (req, res, next) => {
   try {
     const { timeframe, year, month, customStartTime, customEndTime } =
       req.query;
-    // const userId = req.user.id;
-    const userId = 3;
+    const userId = req.user.userId;
 
     const events = await eventService.listEvents(
       userId,
@@ -62,8 +61,7 @@ exports.listEvents = async (req, res, next) => {
 exports.getEventById = async (req, res, next) => {
   try {
     const eventId = parseInt(req.params.eventId);
-    const userId = req.user.id;
-    // const userId = 2;
+    const userId = req.user.userId;
 
     const event = await eventService.getEventById(userId, eventId);
 
@@ -78,8 +76,8 @@ exports.updateEvent = async (req, res, next) => {
   try {
     const eventId = parseInt(req.params.eventId);
     const eventData = req.body;
-    // const userId = req.user.id;
-    const userId = 2;
+    // const userId = req.user.userId;
+    const userId = 1;
 
     // validateEventInput(eventData);
 
@@ -99,8 +97,7 @@ exports.updateEvent = async (req, res, next) => {
 exports.deleteEvent = async (req, res, next) => {
   try {
     const eventId = parseInt(req.params.eventId);
-    // const userId = req.user.id;
-    const userId = 2;
+    const userId = req.user.userId;
 
     await eventService.deleteEvent(eventId, userId);
 

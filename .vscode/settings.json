@@ -1,9 +1,20 @@
 {
   "gitlens.views.contributors.showAllBranches": true,
   "cSpell.words": [
+    "autoincrement",
     "craco",
+    "datasource",
+    "dayview",
+    "errorf",
+    "headlessui",
+    "heroicons",
+    "monthview",
+    "sprintf",
     "tailwindcss",
     "timeframe",
-    "webfonts"
+    "todos",
+    "webfonts",
+    "weekview",
+    "yearview"
   ]
 }

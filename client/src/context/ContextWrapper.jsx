@@ -11,6 +11,7 @@ import {
   saveCalendarEvents,
   getEvents,
 } from "../services/eventServices";
+import { calendarGet, getCalendar } from "../services/calendarService";
 
 export default function ContextWrapper({ children }) {
   const [monthIndex, setMonthIndex] = useState(dayjs());
@@ -26,11 +27,30 @@ export default function ContextWrapper({ children }) {
   const [direction, setDirection] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isWarning, setIsWarning] = useState(false);
+  const [calendarId, setCalendarId] = useState(null);
+  // const [eventType, setEventType] = useState("");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [currentMonthSmallCalendarIdx, setCurrentMonthSmallCalendarIdx] =
     useState(dayjs());
 
   const location = useLocation();
+
+  //create initial value for event type, in case user data is empty
+  // const initialEventTypes = {
+  //   eventTypes: ["My calendar"],
+  //   selectedEventType: "My calendar",
+  // };
+
+  //initialize eventTypes state
+  const [totalEventTypes, eventTypesDispatch] = useReducer(eventTypesReducer, [
+    "My calendar",
+  ]);
+
+  const [checkedLabel, setCheckedLabel] = useState(totalEventTypes);
+
+  useEffect(() => {
+    console.log("checkedLabel", checkedLabel);
+  }, [checkedLabel]);
 
   //initialize savedEvents state
   const [savedEvents, dispatchCalendarEvent] = useReducer(
@@ -38,21 +58,17 @@ export default function ContextWrapper({ children }) {
     []
   );
 
+  const [filteredEvents, setFilteredEvents] = useState([]);
+
+  //filter savedEvents state based on checkedLabel
   useEffect(() => {
-    console.log(typeof yearIndex);
-  }, [yearIndex]);
+    setFilteredEvents(
+      savedEvents.filter((event) => checkedLabel.includes(event.eventType))
+    );
+  }, [checkedLabel, savedEvents]);
 
-  //create initial value for event type, in case user data is empty
-  const initialEventTypes = {
-    eventTypes: ["My calendar"],
-    selectedEventType: "My calendar",
-  };
-
-  //initialize eventTypes state
-  const [totalEventTypes, eventTypesDispatch] = useReducer(
-    eventTypesReducer,
-    initialEventTypes
-  );
+  console.log("filteredEvents", filteredEvents);
+  console.log("savedEvents", savedEvents);
 
   //update savedEvents state when savedEvents is updated
   useEffect(() => {
@@ -89,6 +105,30 @@ export default function ContextWrapper({ children }) {
   //     });
   //   }
   // }, [savedEvents]);
+
+  //fetch event types from database and initialize eventTypes state
+  useEffect(() => {
+    const getCalendar = async () => {
+      try {
+        const response = await calendarGet();
+        if (response) {
+          eventTypesDispatch({
+            type: "INITIAL_EVENT_TYPE",
+            payload: response.data.settings.totalEventTypes,
+          });
+          setCheckedLabel(response.data.settings.totalEventTypes);
+          setCalendarId(response.data.id);
+        }
+      } catch (error) {
+        // console.log(error);
+      }
+    };
+    getCalendar();
+  }, []);
+
+  useEffect(() => {
+    console.log("totalEventTypes", totalEventTypes);
+  }, [totalEventTypes]);
 
   //fetch events from database and initialize savedEvents state
   useEffect(() => {
@@ -141,7 +181,7 @@ export default function ContextWrapper({ children }) {
         setDirection,
         direction,
         dispatchCalendarEvent,
-        savedEvents,
+        savedEvents: filteredEvents,
         totalEventTypes,
         eventTypesDispatch,
         isWarning,
@@ -154,6 +194,9 @@ export default function ContextWrapper({ children }) {
         selectedEvent,
         currentMonthSmallCalendarIdx,
         setCurrentMonthSmallCalendarIdx,
+        setCheckedLabel,
+        checkedLabel,
+        calendarId,
       }}
     >
       {children}

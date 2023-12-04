@@ -6,11 +6,14 @@ import { BsCheck } from "react-icons/bs";
 import GlobalContext from "../../context/GlobalContext";
 import { Menu, Transition, Listbox } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
-import { saveCalendarEvents } from "../../services/eventServices";
+import { createEvent, updateEvent } from "../../services/eventServices";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import { calendarCreate } from "../../services/calendarService";
 
 dayjs.extend(customParseFormat);
+dayjs.extend(utc);
 
 export default function CreateEventModal() {
   const {
@@ -22,24 +25,34 @@ export default function CreateEventModal() {
     totalEventTypes,
     eventTypesDispatch,
     setIsWarning,
+    calendarId,
     isWarning,
     selectedEvent,
     setSelectedEvent,
   } = useContext(GlobalContext);
+  const [location, setLocation] = useState("");
   const [title, setTitle] = useState(selectedEvent ? selectedEvent.title : "");
+  const [collaborator, setCollaborator] = useState("");
   const [description, setDescription] = useState(
     selectedEvent ? selectedEvent.description : ""
   );
-  const currentTime = dateModal.format("HH:mm");
+  const currentTime = dateModal.startOf("hour").format("HH:mm");
   const currentDate = dateModal.format("YYYY-MM-DD");
+  const [eventType, setEventType] = useState(
+    selectedEvent ? selectedEvent.eventType : "My calendar"
+  );
   const [startTime, setStartTime] = useState(
-    selectedEvent ? selectedEvent.startTime.format("HH:mm") : currentTime
+    selectedEvent
+      ? dayjs.utc(selectedEvent.startTime).local().format("HH:mm")
+      : currentTime
   );
   const [chosenDate, setChosenDate] = useState(
     selectedEvent ? selectedEvent.date : currentDate
   );
   const [endTime, setEndTime] = useState(
-    selectedEvent ? selectedEvent.endTime.format("HH:mm") : currentTime
+    selectedEvent
+      ? dayjs.utc(selectedEvent.endTime).local().format("HH:mm")
+      : currentTime
   );
 
   const hours = Array.from({ length: 24 }, (_, i) =>
@@ -61,7 +74,7 @@ export default function CreateEventModal() {
   );
 
   //desc: handle submit event
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     //convert time to dayjs
@@ -69,33 +82,37 @@ export default function CreateEventModal() {
     const endTimeDayjs = dayjs(endTime, "HH:mm");
 
     const newEvent = {
-      title,
-      description,
+      calendarId: calendarId,
+      title: title,
+      description: description,
+      location: "vietnam",
       date: chosenDate,
       startTime: startTimeDayjs,
       endTime: endTimeDayjs,
-      label: selectedLabel,
-      totalEventTypes,
+      color: selectedLabel,
+      eventType: eventType,
     };
-    saveCalendarEvents([...savedEvents, newEvent]);
     if (selectedEvent) {
-      dispatchCalendarEvent({ type: "UPDATE_EVENT", payload: newEvent });
+      const res = await updateEvent(newEvent, selectedEvent.id);
+      dispatchCalendarEvent({ type: "UPDATE_EVENT", payload: res.data });
+      console.log("update event", res);
     } else {
-      dispatchCalendarEvent({ type: "CREATE_EVENT", payload: newEvent });
+      const res = await createEvent(newEvent);
+      dispatchCalendarEvent({ type: "CREATE_EVENT", payload: res.data });
+      // const realTime = dayjs.utc(res.data.startTime);
     }
     setShowModal(false);
     setSelectedEvent(null);
   };
 
   useEffect(() => {
-    console.log(savedEvents);
-    console.log(typeof startTime);
-  }, [savedEvents, startTime, endTime]);
+    console.log("selectedEvent", selectedEvent);
+  }, [selectedEvent]);
 
   //desc: handle selected event type
-  const handleSelectedEventType = (eventType) => {
-    eventTypesDispatch({ type: "SELECTED_EVENT_TYPE", payload: eventType });
-  };
+  // const handleSelectedEventType = (eventType) => {
+  //   eventTypesDispatch({ type: "SELECTED_EVENT_TYPE", payload: eventType });
+  // };
 
   //desc: merge multiple classes into one if the option is active
   function classNames(...classes) {
@@ -106,7 +123,7 @@ export default function CreateEventModal() {
     <AnimatePresence>
       {showModal && (
         <motion.div
-          className="h-screen w-full fixed left-0 flex justify-center items-center backdrop-blur-sm"
+          className="h-screen w-full fixed z-40 left-0 flex justify-center items-center backdrop-blur-sm"
           variants={modalVariants}
           initial="hidden"
           animate="visible"
@@ -119,10 +136,12 @@ export default function CreateEventModal() {
             <header className="px-4 py-2 mt-3 flex justify-between items-center">
               <div className="flex flex-col items-start">
                 <span className="text-lg font-semibold text-gray-500">
-                  Create Schedule
+                  {`${selectedEvent ? "Update" : "Create"} Event`}
                 </span>
                 <span className="text-gray-500 text-sm">
-                  You can create event, meeting and tasks
+                  {`You can ${
+                    selectedEvent ? "update" : "create"
+                  } event, meeting and tasks`}
                 </span>
               </div>
               <button
@@ -158,6 +177,18 @@ export default function CreateEventModal() {
                     className="border border-gray-300 rounded-md p-2"
                   ></textarea>
                 </div>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="title">Choose your collaborator</label>
+                  <input
+                    placeholder="Add your collaborator"
+                    type="text"
+                    name="collaborator"
+                    id="collaborator"
+                    value={collaborator}
+                    onChange={(e) => setCollaborator(e.target.value)}
+                    className="border border-gray-300 rounded-md p-2"
+                  />
+                </div>
                 <div className="flex flex-1 gap-4 justify-between">
                   <div className="flex flex-col gap-2 w-1/2">
                     <label htmlFor="date">Date</label>
@@ -170,22 +201,6 @@ export default function CreateEventModal() {
                   </div>
                   <div className="flex flex-col gap-2 w-1/2">
                     <label htmlFor="time">Time</label>
-                    {/* <div className="flex flex-row gap-2 justify-center">
-                      <input
-                        type="time"
-                        value={startTime}
-                        onChange={(e) => setStartTime(e.target.value)}
-                        className="border border-gray-300 rounded-md p-2"
-                      />
-
-                      <input
-                        type="time"
-                        value={endTime}
-                        onChange={(e) => setEndTime(e.target.value)}
-                        min={startTime}
-                        className="border border-gray-300 rounded-md p-2"
-                      />
-                    </div> */}
                     <div className="flex flex-1 flex-row gap-2 justify-center relative">
                       <Listbox value={startTime} onChange={setStartTime}>
                         <Listbox.Button className="border border-gray-300 rounded-md w-1/2">
@@ -241,9 +256,7 @@ export default function CreateEventModal() {
                     <label htmlFor="">Choose your event type</label>
                     <div className="w-1/2">
                       <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2  text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                        {totalEventTypes.selectedEventType
-                          ? totalEventTypes.selectedEventType
-                          : "Select your event type"}
+                        {!eventType ? totalEventTypes[0] : eventType}
                         <ChevronDownIcon
                           className="-mr-1 h-5 w-5 text-gray-400 mt-1"
                           aria-hidden="true"
@@ -260,27 +273,23 @@ export default function CreateEventModal() {
                       leaveTo="transform opacity-0 scale-95"
                     >
                       <Menu.Items className="absolute top-8 right-0 z-10 mt-2 w-1/2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        {totalEventTypes?.eventTypes?.map(
-                          (eventType, index) => (
-                            <Menu.Item key={index}>
-                              {({ active }) => (
-                                <span
-                                  onClick={() =>
-                                    handleSelectedEventType(eventType)
-                                  }
-                                  className={classNames(
-                                    active
-                                      ? "bg-gray-100 text-gray-900"
-                                      : "text-gray-700",
-                                    "block px-4 py-2"
-                                  )}
-                                >
-                                  {eventType}
-                                </span>
-                              )}
-                            </Menu.Item>
-                          )
-                        )}
+                        {totalEventTypes.map((evt, index) => (
+                          <Menu.Item key={index}>
+                            {({ active }) => (
+                              <span
+                                onClick={() => setEventType(evt)}
+                                className={classNames(
+                                  active
+                                    ? "bg-gray-100 text-gray-900"
+                                    : "text-gray-700",
+                                  "block px-4 py-2"
+                                )}
+                              >
+                                {evt}
+                              </span>
+                            )}
+                          </Menu.Item>
+                        ))}
                       </Menu.Items>
                     </Transition>
                   </Menu>
@@ -309,7 +318,9 @@ export default function CreateEventModal() {
                 className="flex justify-center items-center gap-1 bg-black text-white rounded-lg p-2"
               >
                 <BsCheck className="text-2xl" />
-                <span>Create Schedule</span>
+                <span>
+                  {selectedEvent ? "Update Event" : "Create Schedule"}
+                </span>
               </button>
             </footer>
           </form>

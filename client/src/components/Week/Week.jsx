@@ -1,13 +1,26 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useContext, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { calendarVariants } from "../../animations/calendarVariants";
 import GlobalContext from "../../context/GlobalContext";
 import HourInDayWeek from "./HourInDayWeek";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 export default function Week(props) {
+  dayjs.extend(utc);
   const { week } = { ...props };
-  const { direction, weekIndex } = useContext(GlobalContext);
+  const { direction, weekIndex, savedEvents, setSelectedEvent, setShowModal } =
+    useContext(GlobalContext);
   const [isFirstMount, setIsFirstMount] = useState(true);
+  const [weekEvents, setWeekEvents] = useState([]);
+  const [rowHeight, setRowHeight] = useState(0);
+  const rowRef = useRef(null);
+
+  useEffect(() => {
+    if (rowRef.current) {
+      const height = rowRef.current.getBoundingClientRect().height;
+      setRowHeight(height);
+    }
+  }, []);
 
   useEffect(() => {
     setIsFirstMount(false);
@@ -25,8 +38,24 @@ export default function Week(props) {
   }
 
   useEffect(() => {
-    console.log(week);
-  }, []);
+    console.log("week row height", rowHeight);
+  }, [rowHeight]);
+
+  useEffect(() => {
+    const events = savedEvents.filter((event) => {
+      const eventDate = dayjs(event.date);
+
+      const isSameDay = week.some((dayArray) =>
+        dayArray.some((day) => eventDate.isSame(dayjs(day), "day"))
+      );
+      return isSameDay;
+    });
+    setWeekEvents(events);
+  }, [savedEvents, week]);
+
+  useEffect(() => {
+    console.log("weekEvents", weekEvents);
+  }, [weekEvents]);
 
   return (
     <React.Fragment>
@@ -53,7 +82,7 @@ export default function Week(props) {
         </motion.div>
       </div>
       <motion.div
-        className="justify-items-center pt-4 grid border mt-5  rounded-lg grid-cols-[1fr,11fr] h-[87%] overflow-auto scrollbar scrollbar-thumb-gray-200 scrollbar-track-gray-100"
+        className="justify-items-center pt-4 grid border mt-5  rounded-lg grid-cols-[1fr,11fr] h-[87%] overflow-auto scrollbar scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100"
         variants={calendarVariants(direction)}
         animate="visible"
         initial={isFirstMount ? "visible" : "hidden"}
@@ -69,12 +98,44 @@ export default function Week(props) {
             </p>
           ))}
         </div>
-        <div className="grid  grid-cols-7  grid-rows-24">
-          {week.map((row, index) => (
-            <React.Fragment key={index}>
-              {row.map((hour, index) => (
-                <HourInDayWeek key={index} hour={hour} />
+        <div className="grid grid-cols-7 grid-rows-24 relative">
+          {week.map((day, dayIndex) => (
+            <React.Fragment key={dayIndex}>
+              {day.map((hour, hourIndex) => (
+                <div ref={hourIndex === 0 ? rowRef : null}>
+                  <HourInDayWeek key={hourIndex} hour={hour} />
+                </div>
               ))}
+              {weekEvents
+                // .filter((event) => dayjs(event.date).day() === dayIndex)
+                .map((event, index) => {
+                  const startRow = dayjs.utc(event.startTime).local().hour();
+                  const endRow = dayjs.utc(event.endTime).local().hour();
+                  const span = endRow - startRow;
+                  const dayOfWeek = dayjs(event.date).day();
+
+                  return (
+                    <div
+                      onClick={() => {
+                        setSelectedEvent(event);
+                        setShowModal(true);
+                      }}
+                      key={index}
+                      className={`absolute bg-${event.color}-200 
+                      p-2 mr-3 w-36 cursor-pointer text-gray-600 rounded-md border border-white mb-1 truncate`}
+                      style={{
+                        top: `${startRow * rowHeight}px`,
+                        height: `${span * rowHeight}px`,
+                        gridColumnStart: dayOfWeek + 1,
+                      }}
+                    >
+                      <p className="text-sm font-semibold">{event.title}</p>
+                      <p className="text-xs mt-1">{` ${dayjs.utc(event.startTime).local().format(
+                        "HH:mm"
+                      )} - ${dayjs.utc(event.endTime).local().format("HH:mm")}`}</p>
+                    </div>
+                  );
+                })}
             </React.Fragment>
           ))}
         </div>

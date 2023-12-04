@@ -1,4 +1,5 @@
 import { ROUTES } from "../constant/apiPath";
+import axios from "axios";
 
 // Purpose: To provide functions for fetching and saving events to local storage
 export function fetchEvents() {
@@ -25,9 +26,38 @@ const handleErrors = (error) => {
 
 export async function createEvent(event) {
   try {
-    const response = await fetch(ROUTES.EVENTS.BASE.CREATE, event, {
+    const response = await axios.post(ROUTES.EVENTS.BASE, event, {
       withCredentials: true,
     });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    handleErrors(error);
+  }
+}
+
+export async function updateEvent(event, eventId) {
+  try {
+    const response = await axios.put(
+      `${ROUTES.EVENTS.BASE}/${eventId}`,
+      event,
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    handleErrors(error);
+  }
+}
+
+export async function deleteEvent(eventId) {
+  try {
+    const response = await axios.delete(`${ROUTES.EVENTS.BASE}/${eventId}`, {
+      withCredentials: true,
+    });
+    console.log(response);
     return response.data;
   } catch (error) {
     handleErrors(error);

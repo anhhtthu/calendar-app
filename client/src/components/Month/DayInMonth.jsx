@@ -25,10 +25,6 @@ export default function DayInMonth(props) {
     return dayjs().isSame(day, "month");
   }
 
-  useEffect(() => {
-    console.log(savedEvents);
-  }, [savedEvents]);
-
   return (
     <div
       className={`border ${
@@ -44,7 +40,7 @@ export default function DayInMonth(props) {
         {isToday() && <span className={monthStyles.isToday}></span>}
       </div>
       <div
-        className="flex-1 cursor-pointer"
+        className="flex-1 cursor-pointer max-h-16 overflow-auto scrollbar scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-10"
         onClick={() => {
           setDateModal(day);
           setShowModal(true);
@@ -52,7 +48,7 @@ export default function DayInMonth(props) {
       >
         {monthEvents.map((event, index) => (
           <div
-            className={`bg-${event.label}-200 p-1 mr-3 text-xs text-gray-600 rounded mb-1 truncate`}
+            className={`bg-${event.color}-200 p-1 mr-3 text-xs text-gray-600 rounded mb-1 truncate`}
             key={index}
             onClick={() => setSelectedEvent(event)}
           >

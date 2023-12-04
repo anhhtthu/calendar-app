@@ -1,36 +1,29 @@
 const jwt = require("jsonwebtoken");
-const { prisma } = require("../database/client");
 const config = require("../configs/config");
-const { logger } = require("../utils/logger");
 const ERROR_CODE = require("../constants/errorCode");
 
 const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1]; // Bearer Token
-
-  if (token == null) {
-    return res.sendError(401, ERROR_CODE.TOKEN_REQUIRED, "Token is required");
+  if (!authHeader) {
+    return res.sendError(
+      401,
+      ERROR_CODE.TOKEN_REQUIRED,
+      "Authorization header is required"
+    );
   }
 
+  const tokenParts = authHeader.split(" "); // Bearer Token
+  if (tokenParts.length !== 2 || tokenParts[0] !== "Bearer" || !tokenParts[1]) {
+    return res.sendError(401, ERROR_CODE.TOKEN_INVALID, "Invalid token format");
+  }
+  const token = tokenParts[1];
+
   try {
-    const session = await prisma.session.findFirst({
-      where: { token: token, expiresAt: { gt: new Date()}},
-    });
-
-    if (!session) {
-      return res.sendError(403, ERROR_CODE.TOKEN_NOTFOUND, "Session token not found or has expired.");
-    }
-
-    jwt.verify(token, config.jwt_secret, (err, user) => {
-      if (err) {
-        return res.sendError(403, ERROR_CODE.TOKEN_INVALID, "Invalid token");
-      }
-      req.user = user;
-      next();
-    });
+    const user = jwt.verify(token, config.jwt_secret);
+    req.user = user;
+    next();
   } catch (error) {
-    logger.errorf("Error when checking token against sessions: %v", error);
-    return res.sendError(500, ERROR_CODE.SERVER_ERROR, "Internal Server Error");
+    return res.sendError(403, ERROR_CODE.TOKEN_INVALID, "Invalid token");
   }
 };
 

@@ -4,16 +4,22 @@ import { ChevronUpIcon, PlusIcon } from "@heroicons/react/solid";
 import GlobalContext from "../../context/GlobalContext";
 import { Menu, Transition } from "@headlessui/react";
 import { DotsVerticalIcon } from "@heroicons/react/outline";
+import { calendarUpdate } from "../../services/calendarService";
 export default function EventType() {
   const [openInput, setOpenInput] = useState(false);
   const [inputEventType, setInputEventType] = useState("");
   const [updateIndex, setUpdateIndex] = useState(null);
-  const { eventTypesDispatch, totalEventTypes, savedEvent } =
+  const [shouldUpdate, setShouldUpdate] = useState(false);
+  const [remindInput, setRemindInput] = useState(false);
+  const { eventTypesDispatch, totalEventTypes, setCheckedLabel, checkedLabel } =
     React.useContext(GlobalContext);
 
   //desc: add new event type to eventTypes state
-  const handleAddNewEventType = (e) => {
+  const handleAddNewEventType = async (e) => {
     e.preventDefault();
+
+    if (inputEventType === "") return setRemindInput(true);
+
     if (updateIndex !== null) {
       eventTypesDispatch({
         type: "UPDATE_EVENT_TYPE",
@@ -24,13 +30,32 @@ export default function EventType() {
       eventTypesDispatch({ type: "ADD_EVENT_TYPE", payload: inputEventType });
       setInputEventType("");
     }
+    setCheckedLabel((prevLabel) => [...prevLabel, inputEventType]);
     setInputEventType("");
+    setShouldUpdate(true);
+    setRemindInput(false);
   };
 
   //desc: remove event type from eventTypes state
   const handleRemoveEventType = (eventType) => {
     eventTypesDispatch({ type: "REMOVE_EVENT_TYPE", payload: eventType });
+    setShouldUpdate(true);
   };
+
+  //desc: update event type to database
+  useEffect(() => {
+    const updateCalendarToServer = async () => {
+      try {
+        const res = await calendarUpdate(totalEventTypes);
+        console.log("calendar data send to server", res);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (shouldUpdate) {
+      updateCalendarToServer();
+    }
+  }, [shouldUpdate, totalEventTypes]);
 
   //desc: update event type from eventTypes state
   const handleUpdateEventType = (eventType, index) => {
@@ -38,6 +63,20 @@ export default function EventType() {
     setOpenInput(true);
     setUpdateIndex(index);
   };
+
+  //desc: handle checkbox change, decide to add or remove the label from checkedLabel state
+  const handleCheckboxChange = (label, checked) => {
+    console.log(label, checked);
+    if (checked) {
+      setCheckedLabel((prevLabel) => [...prevLabel, label]);
+    } else {
+      setCheckedLabel((prevLabel) => prevLabel.filter((l) => l !== label));
+    }
+  };
+
+  useEffect(() => {
+    console.log("checkedLabel", checkedLabel);
+  }, [checkedLabel]);
 
   //desc: merge multiple classes into one if the option is active
   function classNames(...classes) {
@@ -88,15 +127,26 @@ export default function EventType() {
                       <PlusIcon className=" w-1/2 p-1 text-gray-500 hover:bg-gray-200 rounded-full" />
                     </button>
                   </form>
+                  {remindInput && (
+                    <p className="text-rose-500 text-xs mt-2 ml-2  italic">
+                      *Event type cannot be empty
+                    </p>
+                  )}
 
                   <div className="mt-5 flex flex-col">
-                    {totalEventTypes.eventTypes.map((eventType, index) => (
+                    {totalEventTypes?.map((eventType, index) => (
                       <Menu as="div" key={index} className="relative group">
                         <div className="flex justify-between justify-between items-center py-2 px-1 hover:bg-gray-100">
                           <div className="flex items-center">
                             <input
                               defaultChecked
                               type="checkbox"
+                              onChange={(e) =>
+                                handleCheckboxChange(
+                                  eventType,
+                                  e.target.checked
+                                )
+                              }
                               className="inline-block form-checkbox h-4 w-4 rounded-sm border-gray-400 text-violet-500 focus:outline-none focus:ring-0"
                             />
                             <label className="inline-block ml-2 text-gray-500  font-semibold ">

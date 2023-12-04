@@ -11,13 +11,13 @@ function responseFormat(req, res, next) {
 
   res.sendError = function (statusCode, errorCode, message, data) {
     const response = {
-      statusCode,
-      errorCode,
-      message,
-      data
-    }
-    res.status(statusCode).json(response)
-  }
+      statusCode: statusCode ?? 500,
+      errorCode: errorCode ?? -1,
+      message: message ?? "Error",
+      data: data ?? null,
+    };
+    res.status(statusCode).json(response);
+  };
 
   next();
 }

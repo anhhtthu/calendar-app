@@ -24,7 +24,7 @@ model Session {
   id Int @id @default(autoincrement())
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
-  token String
+  refreshToken String
   expiresAt DateTime
   createdAt DateTime @default(now())
   @@index([userId])
@@ -49,6 +49,7 @@ model Event {
   description String?
   location String?
   color String @default("#FFFFFF")
+  date String?
   startTime DateTime
   endTime DateTime
   allDay Boolean @default(false)
@@ -78,6 +79,7 @@ model RecurringEvent {
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId Int
   pattern String
+  startDate DateTime?
   endDate DateTime?
   numberOfOccurrences Int?
   createdAt DateTime @default(now())
