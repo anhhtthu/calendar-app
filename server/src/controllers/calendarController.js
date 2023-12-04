@@ -7,7 +7,7 @@ const { logger } = require("../utils/logger");
 // Create a new calendar for a user
 exports.createCalendar = async (req, res) => {
   try {
-    // const  userId  = req.user.id;
+    // const  userId  = req.user.userId;
 
     const userId = 1;
     const { settings } = req.body;
@@ -25,7 +25,7 @@ exports.createCalendar = async (req, res) => {
 // Get a user's calendar
 exports.getCalendar = async (req, res) => {
   try {
-    // const  userId  = req.user.id;
+    // const  userId  = req.user.userId;
     const userId = 1;
     // Find the calendar for the specified user
     const calendar = await calendarService.getCalendar(userId);
@@ -39,7 +39,7 @@ exports.getCalendar = async (req, res) => {
 // Update a user's calendar
 exports.updateCalendar = async (req, res) => {
   try {
-    // const userId  = req.user.id;
+    // const userId  = req.user.userId;
     const userId = 1;
     const { totalEventTypes } = req.body;
     console.log("check the totalEventTypes data", totalEventTypes);

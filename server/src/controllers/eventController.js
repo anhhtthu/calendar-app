@@ -9,7 +9,7 @@ const { validateEventInput } = require("../services/eventServiceHelpers");
 exports.createEvent = async (req, res, next) => {
   try {
     const userId = 1;
-    // const userId = req.user.id;
+    // const userId = req.user.userId;
     const eventData = req.body;
 
     // Validate event input
