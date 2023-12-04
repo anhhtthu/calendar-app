@@ -4,25 +4,14 @@ import axios from "axios";
 
 export default function ChangePassword() {
   const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
+    oldPassword: "",
     newPassword: "",
   });
-
-  useEffect(() => {
-    const fetchPasswordData = async () => {
-      try {
-        const response = await axios.get("/api/changepassword");
-        setPasswordData(response.data);
-      } catch (error) {
-        console.error("Failed to fetch password data", error);
-      }
-    }
-  }, []);
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     try {
-      await axios.post("/api/changepassword", passwordData);
+      await axios.post("/api/v1/users/update-password", passwordData);
       console.log("Password updated successfully");
     } catch (error) {
       console.error("Failed to update password", error);
@@ -65,28 +54,29 @@ export default function ChangePassword() {
         <Link to="/userprofile" className="py-4 inline-block">Your Profile</Link>
       </li>
         <li className="mr-8 text-gray-900 border-b-2 border-gray-800"><a href="#_" className="py-4 inline-block">Change Password</a></li>
+        
       </ul>
       <form onSubmit={handleFormSubmit}>
         <div className="w-full bg-white rounded-lg mx-auto mt-8 flex overflow-hidden rounded-b-none">
           <div className="w-1/3 bg-gray-100 p-8 hidden md:inline-block">
-            <h2 className="font-medium text-md text-gray-700 mb-4 tracking-wide">Update Your Password</h2>
+            <h2 className="font-medium text-md text-gray-700 mb-4 tracking-wide">Change Password</h2>
           </div>
           <div className="md:w-2/3 w-full">
             <div className="py-8 px-16">
-              <label htmlFor="currentPassword" className="text-sm text-gray-600">Current Password</label>
+              <label htmlFor="oldPassword" className="text-sm text-gray-600">Current Password</label>
               <input
-                className="mt-2 border-2 border-gray-200 px-3 py-2 block w-full rounded-lg text-base text-gray-900 focus:outline-none focus:border-violet-500"
+                className="mt-2 border-2 border-gray-200 px-3 py-2 block w-full rounded-lg text-base text-gray-900 focus:outline-none focus:border-black"
                 type="password"
-                value={passwordData.currentPassword}
-                name="currentPassword"
-                onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                value={passwordData.oldPassword}
+                name="oldPassword"
+                onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
               />
             </div>
             <hr className="border-gray-200" />
             <div className="py-8 px-16">
               <label htmlFor="newPassword" className="text-sm text-gray-600">New Password</label>
               <input
-                className="mt-2 border-2 border-gray-200 px-3 py-2 block w-full rounded-lg text-base text-gray-900 focus:outline-none focus:border-violet-500"
+                className="mt-2 border-2 border-gray-200 px-3 py-2 block w-full rounded-lg text-base text-gray-900 focus:outline-none focus:border-black"
                 type="password"
                 value={passwordData.newPassword}
                 name="newPassword"
@@ -95,9 +85,14 @@ export default function ChangePassword() {
             </div>     
           </div>
         </div>
-        <div className="p-16 py-8 bg-gray-100 clearfix rounded-b-lg border-t border-gray-300">
-          <p className="text-xs text-gray-500 tracking-tight mt-2">Click to update your password</p>
-          <input type="submit" value="Save" className="bg-violet-500 text-white text-sm font-medium px-6 py-2 rounded float-right uppercase cursor-pointer" defaultValue="Save" />
+        <div className="flex justify-between items-center  p-16 py-8 bg-gray-100 rounded-b-lg border-t border-gray-300">
+          <div className="text-xs text-gray-500 tracking-tight">
+            <p>Click to update your Password</p>
+          </div>
+
+          <div className="flex items-center bg-black text-white text-sm font-medium px-6 py-2 rounded float-right uppercase cursor-pointer">
+            <input type="submit" value="Save" defaultValue="Save" />
+          </div>
         </div>
       </form>
     </div>
