@@ -28,9 +28,7 @@ apiClient.interceptors.response.use(
     return response;
   },
   async (error) => {
-    console.log("Interceptor error: ", error);
     const originalRequest = error.config;
-    console.log("Interceptor error originalRequest: ", originalRequest);
 
     // check if the error is due to token expiration
     if (error.response.status === 403 && !originalRequest._retry) {
@@ -41,10 +39,7 @@ apiClient.interceptors.response.use(
           ROUTES.AUTH.BASE + ROUTES.AUTH.REFRESH_TOKEN
         );
 
-        console.log("get new access token: ", response.data.data.accessToken);
-
         const accessToken = response.data.data.accessToken;
-
         sessionStorage.setItem("accessToken", accessToken);
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
