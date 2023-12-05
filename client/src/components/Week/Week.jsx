@@ -72,43 +72,54 @@ export default function Week(props) {
   }
 
   function countOverlap() {
-    // if (isDisplayEvent) {
-    let newEvents = [...weekEvents]; // create a copy of weekEvents
-
-    while (newEvents.length > 0) {
-      const event = newEvents[0]; // get the first event
-
-      const numberOfOverlap = newEvents.filter(
-        (otherEvent) =>
-          otherEvent.id !== event.id && checkOverlap(event, otherEvent)
-      ).length;
-
-      let eventWidth;
-      switch (numberOfOverlap) {
-        case 0:
-          eventWidth = "w-[10rem] z-[14]";
-          break;
-        case 1:
-          eventWidth = "w-[8rem] left-[2rem] z-[15]";
-          break;
-        case 2:
-          eventWidth = "w-[6rem] left-[4rem] z-[16]";
-          break;
-        case 3:
-          eventWidth = "w-[4rem] left-[6rem] z-[17]";
-          break;
-        case 4:
-          eventWidth = "w-[2rem] left-[8rem] z-[18]";
-          break;
-        default:
-          eventWidth = "w-[1rem] left-[9rem] z-[20]";
-          break;
+    const eventsGroupByDay = weekEvents.reduce((groups, event) => {
+      const day = dayjs(event.date).day();
+      console.log("day in countOverlap", day);
+      if (!groups[day]) {
+        groups[day] = [];
       }
+      groups[day].push(event);
+      return groups;
+    }, {});
 
-      newWidths.current.set(event.id, eventWidth);
+    Object.values(eventsGroupByDay).forEach((events) => {
+      let newEvents = [...events]; // create a copy of weekEvents
 
-      newEvents = newEvents.filter((e) => e.id !== event.id); // remove the event from newEvents
-    }
+      while (newEvents.length > 0) {
+        const event = newEvents[0]; // get the first event
+
+        const numberOfOverlap = newEvents.filter(
+          (otherEvent) =>
+            otherEvent.id !== event.id && checkOverlap(event, otherEvent)
+        ).length;
+
+        let eventWidth;
+        switch (numberOfOverlap) {
+          case 0:
+            eventWidth = "w-[8rem] z-[14]";
+            break;
+          case 1:
+            eventWidth = "w-[6.5rem] left-[1.5rem] z-[15]";
+            break;
+          case 2:
+            eventWidth = "w-[5rem] left-[3rem] z-[16]";
+            break;
+          case 3:
+            eventWidth = "w-[3.5rem] left-[4.5rem] z-[17]";
+            break;
+          case 4:
+            eventWidth = "w-[2rem] left-[6rem] z-[18]";
+            break;
+          default:
+            eventWidth = "w-[1rem] left-[7rem] z-[20]";
+            break;
+        }
+
+        newWidths.current.set(event.id, eventWidth);
+
+        newEvents = newEvents.filter((e) => e.id !== event.id); // remove the event from newEvents
+      }
+    });
     setWidthEvents(new Map(newWidths.current));
   }
 
@@ -187,7 +198,7 @@ export default function Week(props) {
                     className={`absolute bg-${
                       event.color
                     }-200 ${widthEvents.get(event.id)} 
-                      p-2 cursor-pointer text-gray-600 rounded-md border border-white mb-1 truncate`}
+                      p-2 cursor-pointer ml-5 text-gray-600 rounded-md border border-white mb-1 truncate`}
                     style={{
                       top: `${startRow * rowHeight}px`,
                       height: `${span * rowHeight}px`,
