@@ -10,22 +10,22 @@ export default function DayViewCalendar() {
   const { dayIndex, setIsDisplayEvent, dispatchCalendarEvent } =
     useContext(GlobalContext);
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const response = await getEvents();
-        if (response) {
-          dispatchCalendarEvent({
-            type: "INITIAL_EVENTS",
-            payload: response.data,
-          });
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchEvents();
-  }, []);
+  // useEffect(() => {
+  //   const fetchEvents = async () => {
+  //     try {
+  //       const response = await getEvents();
+  //       if (response) {
+  //         dispatchCalendarEvent({
+  //           type: "INITIAL_EVENTS",
+  //           payload: response.data,
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   fetchEvents();
+  // }, []);
 
   useEffect(() => {
     setCurrentDay(getDay(dayIndex));

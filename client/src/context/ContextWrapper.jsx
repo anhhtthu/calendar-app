@@ -84,69 +84,9 @@ export default function ContextWrapper({ children }) {
     }
   }, [location]);
 
-  // initialize eventTypes state when savedEvents is updated
-  useEffect(() => {
-    if (savedEvents && savedEvents.length > 0) {
-      eventTypesDispatch({
-        type: "INITIAL_EVENT_TYPE",
-        payload: savedEvents.totalEventTypes,
-      });
-    }
-  }, [savedEvents]);
-
-  //fetch event types from database and initialize eventTypes state
-  useEffect(() => {
-    const getCalendar = async () => {
-      try {
-        const response = await calendarGet();
-        if (response) {
-          eventTypesDispatch({
-            type: "INITIAL_EVENT_TYPE",
-            payload: response.data.settings.totalEventTypes,
-          });
-          setCheckedLabel(response.data.settings.totalEventTypes);
-          setCalendarId(response.data.id);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getCalendar();
-  }, []);
-
   useEffect(() => {
     console.log("totalEventTypes", totalEventTypes);
   }, [totalEventTypes]);
-
-  //fetch events from database and initialize savedEvents state
-  // useEffect(() => {
-  //   const fetchEvents = async () => {
-  //     try {
-  //       const events = await getEvents();
-  //       console.log(events);
-  //       if (events.length > 0) {
-  //         dispatchCalendarEvent({
-  //           type: "INITIAL_EVENT",
-  //           payload: events,
-  //         });
-  //       }
-  //       setLoading(false);
-  //     } catch (error) {
-  //       console.log(error);
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchEvents();
-  // }, []);
-
-  //purpose: render the loading screen until the todos are fetched from the database
-  // if (loading) {
-  //   return (
-  //     <div className="flex justify-center items-center h-screen">
-  //       <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
-  //     </div>
-  //   );
-  // }
 
   return (
     <GlobalContext.Provider
@@ -186,6 +126,7 @@ export default function ContextWrapper({ children }) {
         checkedLabel,
         calendarId,
         setIsDisplayEvent,
+        setCalendarId,
       }}
     >
       {children}

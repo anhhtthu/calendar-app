@@ -30,7 +30,7 @@ export default function Calendar() {
           setCalendarId(response.data.id);
         }
       } catch (error) {
-        // console.log(error);
+        console.log(error);
       }
     };
     getCalendar();

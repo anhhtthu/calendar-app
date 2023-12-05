@@ -73,7 +73,7 @@ export default function CreateEventModal() {
   //choose what label for the event
   const [selectedLabel, setSelectedLabel] = useState(
     selectedEvent
-      ? labelClasses.find((label) => label === selectedEvent.label)
+      ? labelClasses.find((label) => label === selectedEvent.color)
       : labelClasses[0]
   );
 
@@ -104,6 +104,7 @@ export default function CreateEventModal() {
     } else {
       const res = await createEvent(newEvent);
       dispatchCalendarEvent({ type: "CREATE_EVENT", payload: res.data });
+
       // const realTime = dayjs.utc(res.data.startTime);
     }
     setShowModal(false);
@@ -112,8 +113,8 @@ export default function CreateEventModal() {
   };
 
   useEffect(() => {
-    console.log("selectedEvent", selectedEvent);
-  }, [selectedEvent]);
+    console.log("outside the submit", totalEventTypes);
+  }, [totalEventTypes]);
 
   const handleDeleteEvent = async (e) => {
     e.preventDefault();
@@ -302,7 +303,7 @@ export default function CreateEventModal() {
                       leaveTo="transform opacity-0 scale-95"
                     >
                       <Menu.Items className="absolute top-8 right-0 z-10 mt-2 w-1/2 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        {totalEventTypes.map((evt, index) => (
+                        {totalEventTypes?.map((evt, index) => (
                           <Menu.Item key={index}>
                             {({ active }) => (
                               <span
