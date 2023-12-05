@@ -1,16 +1,15 @@
 const ERROR_CODE = require("../constants/errorCode");
 const CustomError = require("../utils/customError");
 const { logger } = require("../utils/logger");
-const bcrypt = require("bcrypt");
 
 const tokenService = require("../services/tokenService");
 const userService = require("../services/userService");
 
 exports.login = async (req, res, next) => {
   try {
-    const { usernameOrEmail, password } = req.body;
+    const { username, password } = req.body;
 
-    if (!usernameOrEmail || !password) {
+    if (!username || !password) {
       throw new CustomError(
         400,
         ERROR_CODE.USER_LOGIN_INPUT_INVALID,
@@ -18,19 +17,18 @@ exports.login = async (req, res, next) => {
       );
     }
 
-    const user = await userService.validateUserCredentials(
-      usernameOrEmail,
-      password
-    );
+    const user = await userService.validateUserCredentials(username, password);
 
     const accessToken = await tokenService.generateAccessToken(user.id);
     const refreshToken = await tokenService.generateRefreshToken(user.id);
 
     await tokenService.storedRefreshToken(user.id, refreshToken);
 
+    // set refreshToken as httpOnly cookie
+    res.setRefreshTokenCookie(refreshToken);
+
     res.sendData("User login successfully", {
       accessToken: accessToken,
-      refreshToken: refreshToken,
     });
   } catch (error) {
     logger.errorf("Error in user login: %v", error);
@@ -39,16 +37,16 @@ exports.login = async (req, res, next) => {
 };
 
 exports.refreshToken = async (req, res, next) => {
-  const { refreshToken } = req.body;
-  if (!refreshToken) {
-    throw new CustomError(
-      400,
-      ERROR_CODE.TOKEN_REQUIRED,
-      "Refresh token is required"
-    );
-  }
-
   try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      throw new CustomError(
+        401,
+        ERROR_CODE.TOKEN_REQUIRED,
+        "Refresh token required"
+      );
+    }
+
     const { userId } = await tokenService.verifyRefreshToken(refreshToken);
 
     const newAccessToken = await tokenService.generateAccessToken(userId);

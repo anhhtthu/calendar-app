@@ -1,15 +1,11 @@
-// Import necessary modules and dependencies
 const calendarService = require("../services/calendarService");
 const { logger } = require("../utils/logger");
 
-// Controller methods for CRUD operations
-
-// Create a new calendar for a user
 exports.createCalendar = async (req, res) => {
   try {
-    // const  userId  = req.user.id;
+    const userId = req.user.userId;
 
-    const userId = 1;
+    // const userId = 1;
     const { settings } = req.body;
 
     // Create a new calendar
@@ -22,11 +18,11 @@ exports.createCalendar = async (req, res) => {
     return res.sendError(error.status, error.errorCode, error.message);
   }
 };
-// Get a user's calendar
+
 exports.getCalendar = async (req, res) => {
   try {
-    // const  userId  = req.user.id;
-    const userId = 1;
+    const userId = req.user.userId;
+
     // Find the calendar for the specified user
     const calendar = await calendarService.getCalendar(userId);
 
@@ -36,11 +32,11 @@ exports.getCalendar = async (req, res) => {
     return res.sendError(error.status, error.errorCode, error.message);
   }
 };
-// Update a user's calendar
+
 exports.updateCalendar = async (req, res) => {
   try {
-    // const userId  = req.user.id;
-    const userId = 1;
+    const userId = req.user.userId;
+    // const userId = 1;
     const { totalEventTypes } = req.body;
     console.log("check the totalEventTypes data", totalEventTypes);
     // const eventTypes = ["my calendar", "something"];
@@ -55,7 +51,7 @@ exports.updateCalendar = async (req, res) => {
     res.status(500).json({ error: "Failed to update calendar" });
   }
 };
-// Delete a user's calendar
+
 exports.deleteCalendar = async (req, res) => {
   try {
     const { userId } = req.params;

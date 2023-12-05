@@ -6,6 +6,7 @@ const {
   cors,
   responseFormat,
 } = require("./middleware");
+const cookieParser = require("cookie-parser");
 const CustomError = require("./utils/customError");
 const { logger } = require("./utils/logger");
 const CronJob = require("cron").CronJob;
@@ -21,6 +22,7 @@ const app = express();
 
 app.use(cors);
 app.use(bodyParser);
+app.use(cookieParser());
 app.use(logRequest);
 app.use(responseFormat);
 

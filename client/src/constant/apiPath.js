@@ -4,7 +4,10 @@ export const ROUTES = {
   // User Authentication Route
   AUTH: {
     BASE: `${API_PATH}/auth`,
-    LOGIN: `/login`,
+    REGISTER: "/register",
+    LOGIN: "/login",
+    LOGOUT: "/logout",
+    REFRESH_TOKEN: "/refresh-token",
   },
 
   // Calendars Route

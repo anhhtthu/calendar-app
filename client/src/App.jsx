@@ -8,6 +8,8 @@ import MonthViewCalendar from "./pages/MonthViewCalendar";
 import WeekViewCalendar from "./pages/WeekViewCalendar";
 import DayViewCalendar from "./pages/DayViewCalendar";
 import YearViewCalendar from "./pages/YearViewCalendar";
+import UserProfile from "./pages/UserProfile";
+import ChangePassword from "./pages/ChangePassword";
 import React from "react";
 
 function App() {
@@ -17,6 +19,8 @@ function App() {
       <Routes location={location} key={location.key}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/userprofile" element={<UserProfile />} />
+        <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/calendar" element={<Calendar />}>
           <Route index element={<Navigate to="monthview" replace />} />
           <Route path="monthview" element={<MonthViewCalendar />} />
