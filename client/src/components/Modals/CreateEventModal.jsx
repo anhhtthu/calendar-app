@@ -2,15 +2,19 @@ import React, { useContext, useState, Fragment, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { modalVariants } from "../../animations/modalVariants";
 import { AiOutlineClose } from "react-icons/ai";
+import { GoTrash } from "react-icons/go";
 import { BsCheck } from "react-icons/bs";
 import GlobalContext from "../../context/GlobalContext";
 import { Menu, Transition, Listbox } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
-import { createEvent, updateEvent } from "../../services/eventServices";
+import {
+  createEvent,
+  updateEvent,
+  deleteEvent,
+} from "../../services/eventServices";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { calendarCreate } from "../../services/calendarService";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
@@ -20,13 +24,10 @@ export default function CreateEventModal() {
     showModal,
     setShowModal,
     dateModal,
-    savedEvents,
     dispatchCalendarEvent,
     totalEventTypes,
-    eventTypesDispatch,
     setIsWarning,
     calendarId,
-    isWarning,
     selectedEvent,
     setSelectedEvent,
   } = useContext(GlobalContext);
@@ -109,10 +110,14 @@ export default function CreateEventModal() {
     console.log("selectedEvent", selectedEvent);
   }, [selectedEvent]);
 
-  //desc: handle selected event type
-  // const handleSelectedEventType = (eventType) => {
-  //   eventTypesDispatch({ type: "SELECTED_EVENT_TYPE", payload: eventType });
-  // };
+  const handleDeleteEvent = async (e) => {
+    e.preventDefault();
+    const res = await deleteEvent(selectedEvent.id);
+    console.log("delete event", res);
+    dispatchCalendarEvent({ type: "REMOVE_EVENT", payload: selectedEvent });
+    setShowModal(false);
+    setSelectedEvent(null);
+  };
 
   //desc: merge multiple classes into one if the option is active
   function classNames(...classes) {
@@ -123,7 +128,7 @@ export default function CreateEventModal() {
     <AnimatePresence>
       {showModal && (
         <motion.div
-          className="h-screen w-full fixed z-40 left-0 flex justify-center items-center backdrop-blur-sm"
+          className="h-screen w-full fixed z-40 left-0 flex justify-center items-center backdrop-blur-sm "
           variants={modalVariants}
           initial="hidden"
           animate="visible"
@@ -154,7 +159,7 @@ export default function CreateEventModal() {
                 <AiOutlineClose className="text-gray-400 text-xl" />
               </button>
             </header>
-            <main className="p-4 text-gray-500">
+            <main className="p-4 text-gray-500 max-h-[40rem] overflow-auto scrollbar scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                   <label htmlFor="title">Title</label>
@@ -312,10 +317,22 @@ export default function CreateEventModal() {
                 </div>
               </div>
             </main>
-            <footer className="p-4 flex flex-col justify-center">
+            <footer className="p-4 flex flex-1 justify-between gap-3">
+              {selectedEvent && (
+                <button
+                  onClick={(e) => handleDeleteEvent(e)}
+                  type="button"
+                  className="flex justify-center w-1/2 items-center gap-1 bg-black text-white rounded-lg p-2"
+                >
+                  <GoTrash className="text-2xl" />
+                  <span>Delete Event</span>
+                </button>
+              )}
               <button
                 type="submit"
-                className="flex justify-center items-center gap-1 bg-black text-white rounded-lg p-2"
+                className={`flex justify-center ${
+                  selectedEvent ? `w-1/2` : `w-full`
+                } items-center gap-1 bg-black text-white rounded-lg p-2`}
               >
                 <BsCheck className="text-2xl" />
                 <span>

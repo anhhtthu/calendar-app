@@ -97,7 +97,9 @@ exports.updateEvent = async (req, res, next) => {
 exports.deleteEvent = async (req, res, next) => {
   try {
     const eventId = parseInt(req.params.eventId);
-    const userId = req.user.userId;
+
+    // const userId = req.user.userId;
+    const userId = 1;
 
     await eventService.deleteEvent(eventId, userId);
 

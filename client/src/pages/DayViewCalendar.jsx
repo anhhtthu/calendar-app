@@ -6,9 +6,13 @@ import Day from "../components/Day/Day";
 
 export default function DayViewCalendar() {
   const [currentDay, setCurrentDay] = useState(getDay());
-  const { dayIndex } = useContext(GlobalContext);
+  const { dayIndex, setIsDisplayEvent } = useContext(GlobalContext);
   useEffect(() => {
     setCurrentDay(getDay(dayIndex));
+    setIsDisplayEvent(true);
+    return () => {
+      setIsDisplayEvent(false);
+    };
   }, [dayIndex]);
 
   return (

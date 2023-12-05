@@ -64,16 +64,16 @@ export async function deleteEvent(eventId) {
   }
 }
 
-export async function getEvents() {
-  try {
-    const response = await fetch(ROUTES.EVENTS.BASE.GET, {
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (error) {
-    handleErrors(error);
-  }
-}
+// export async function getEvents() {
+//   try {
+//     const response = await fetch(ROUTES.EVENTS.BASE.GET, {
+//       withCredentials: true,
+//     });
+//     return response.data;
+//   } catch (error) {
+//     handleErrors(error);
+//   }
+// }
 
 //Purpose: To fetch events from server
 // export async function fetchEvents() {

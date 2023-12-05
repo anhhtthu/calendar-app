@@ -11,6 +11,8 @@ export default function Week(props) {
   const { direction, weekIndex, savedEvents, setSelectedEvent, setShowModal } =
     useContext(GlobalContext);
   const [isFirstMount, setIsFirstMount] = useState(true);
+  const [widthEvents, setWidthEvents] = useState({});
+
   const [weekEvents, setWeekEvents] = useState([]);
   const [rowHeight, setRowHeight] = useState(0);
   const rowRef = useRef(null);
@@ -55,6 +57,68 @@ export default function Week(props) {
 
   useEffect(() => {
     console.log("weekEvents", weekEvents);
+  }, [weekEvents]);
+
+  const newWidths = useRef(new Map());
+
+  function checkOverlap(event1, event2) {
+    const startEvent1 = dayjs.utc(event1.startTime).local().hour();
+    const startEvent2 = dayjs.utc(event2.startTime).local().hour();
+    const endEvent1 = dayjs.utc(event1.endTime).local().hour();
+    const endEvent2 = dayjs.utc(event2.endTime).local().hour();
+    const overlap = startEvent1 < endEvent2 && startEvent2 < endEvent1;
+
+    return overlap;
+  }
+
+  function countOverlap() {
+    // if (isDisplayEvent) {
+    let newEvents = [...weekEvents]; // create a copy of weekEvents
+
+    while (newEvents.length > 0) {
+      const event = newEvents[0]; // get the first event
+
+      const numberOfOverlap = newEvents.filter(
+        (otherEvent) =>
+          otherEvent.id !== event.id && checkOverlap(event, otherEvent)
+      ).length;
+
+      let eventWidth;
+      switch (numberOfOverlap) {
+        case 0:
+          eventWidth = "w-[10rem] z-[14]";
+          break;
+        case 1:
+          eventWidth = "w-[8rem] left-[2rem] z-[15]";
+          break;
+        case 2:
+          eventWidth = "w-[6rem] left-[4rem] z-[16]";
+          break;
+        case 3:
+          eventWidth = "w-[4rem] left-[6rem] z-[17]";
+          break;
+        case 4:
+          eventWidth = "w-[2rem] left-[8rem] z-[18]";
+          break;
+        default:
+          eventWidth = "w-[1rem] left-[9rem] z-[20]";
+          break;
+      }
+
+      newWidths.current.set(event.id, eventWidth);
+
+      newEvents = newEvents.filter((e) => e.id !== event.id); // remove the event from newEvents
+    }
+    setWidthEvents(new Map(newWidths.current));
+  }
+
+  useEffect(() => {
+    console.log("widthEvents", widthEvents);
+  }, [widthEvents]);
+
+  useEffect(() => {
+    countOverlap();
+    console.log("is running");
   }, [weekEvents]);
 
   return (
@@ -106,36 +170,41 @@ export default function Week(props) {
                   <HourInDayWeek key={hourIndex} hour={hour} />
                 </div>
               ))}
-              {weekEvents
-                // .filter((event) => dayjs(event.date).day() === dayIndex)
-                .map((event, index) => {
-                  const startRow = dayjs.utc(event.startTime).local().hour();
-                  const endRow = dayjs.utc(event.endTime).local().hour();
-                  const span = endRow - startRow;
-                  const dayOfWeek = dayjs(event.date).day();
 
-                  return (
-                    <div
-                      onClick={() => {
-                        setSelectedEvent(event);
-                        setShowModal(true);
-                      }}
-                      key={index}
-                      className={`absolute bg-${event.color}-200 
-                      p-2 mr-3 w-36 cursor-pointer text-gray-600 rounded-md border border-white mb-1 truncate`}
-                      style={{
-                        top: `${startRow * rowHeight}px`,
-                        height: `${span * rowHeight}px`,
-                        gridColumnStart: dayOfWeek + 1,
-                      }}
-                    >
-                      <p className="text-sm font-semibold">{event.title}</p>
-                      <p className="text-xs mt-1">{` ${dayjs.utc(event.startTime).local().format(
-                        "HH:mm"
-                      )} - ${dayjs.utc(event.endTime).local().format("HH:mm")}`}</p>
-                    </div>
-                  );
-                })}
+              {weekEvents.map((event, index) => {
+                const startRow = dayjs.utc(event.startTime).local().hour();
+                const endRow = dayjs.utc(event.endTime).local().hour();
+                const span = endRow - startRow;
+                const dayOfWeek = dayjs(event.date).day();
+
+                return (
+                  <div
+                    onClick={() => {
+                      setSelectedEvent(event);
+                      setShowModal(true);
+                    }}
+                    key={index}
+                    className={`absolute bg-${
+                      event.color
+                    }-200 ${widthEvents.get(event.id)} 
+                      p-2 cursor-pointer text-gray-600 rounded-md border border-white mb-1 truncate`}
+                    style={{
+                      top: `${startRow * rowHeight}px`,
+                      height: `${span * rowHeight}px`,
+                      gridColumnStart: dayOfWeek + 1,
+                    }}
+                  >
+                    <p className="text-sm font-semibold">{event.title}</p>
+                    <p className="text-xs mt-1">{` ${dayjs
+                      .utc(event.startTime)
+                      .local()
+                      .format("HH:mm")} - ${dayjs
+                      .utc(event.endTime)
+                      .local()
+                      .format("HH:mm")}`}</p>
+                  </div>
+                );
+              })}
             </React.Fragment>
           ))}
         </div>

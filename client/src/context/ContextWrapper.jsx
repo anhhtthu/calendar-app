@@ -26,6 +26,7 @@ export default function ContextWrapper({ children }) {
   const [showModal, setShowModal] = useState(false);
   const [direction, setDirection] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [isDisplayEvent, setIsDisplayEvent] = useState(false);
   const [isWarning, setIsWarning] = useState(false);
   const [calendarId, setCalendarId] = useState(null);
   // const [eventType, setEventType] = useState("");
@@ -34,12 +35,6 @@ export default function ContextWrapper({ children }) {
     useState(dayjs());
 
   const location = useLocation();
-
-  //create initial value for event type, in case user data is empty
-  // const initialEventTypes = {
-  //   eventTypes: ["My calendar"],
-  //   selectedEventType: "My calendar",
-  // };
 
   //initialize eventTypes state
   const [totalEventTypes, eventTypesDispatch] = useReducer(eventTypesReducer, [
@@ -131,34 +126,34 @@ export default function ContextWrapper({ children }) {
   }, [totalEventTypes]);
 
   //fetch events from database and initialize savedEvents state
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const events = await getEvents();
-        console.log(events);
-        if (events.length > 0) {
-          dispatchCalendarEvent({
-            type: "INITIAL_EVENT",
-            payload: events,
-          });
-        }
-        setLoading(false);
-      } catch (error) {
-        console.log(error);
-        setLoading(false);
-      }
-    };
-    fetchEvents();
-  }, []);
+  // useEffect(() => {
+  //   const fetchEvents = async () => {
+  //     try {
+  //       const events = await getEvents();
+  //       console.log(events);
+  //       if (events.length > 0) {
+  //         dispatchCalendarEvent({
+  //           type: "INITIAL_EVENT",
+  //           payload: events,
+  //         });
+  //       }
+  //       setLoading(false);
+  //     } catch (error) {
+  //       console.log(error);
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchEvents();
+  // }, []);
 
   //purpose: render the loading screen until the todos are fetched from the database
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center h-screen">
+  //       <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500"></div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <GlobalContext.Provider
@@ -197,6 +192,8 @@ export default function ContextWrapper({ children }) {
         setCheckedLabel,
         checkedLabel,
         calendarId,
+        setIsDisplayEvent,
+        isDisplayEvent,
       }}
     >
       {children}

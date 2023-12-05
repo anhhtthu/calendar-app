@@ -1,6 +1,7 @@
 import React, { useEffect, useContext, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import dayjs from "dayjs";
+import { utc } from "dayjs";
 import { useNavigate } from "react-router-dom";
 import GlobalContext from "../../context/GlobalContext";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -12,7 +13,7 @@ export default function YearEventModal(props) {
   const { savedEvents, setDayIndex } = useContext(GlobalContext);
   const [todayEvents, setTodayEvents] = useState([]);
   const navigate = useNavigate();
-
+  dayjs.extend(utc);
   useEffect(() => {
     if (sizeRef.current) {
       const { offsetWidth, offsetHeight } = sizeRef.current;
@@ -83,11 +84,11 @@ export default function YearEventModal(props) {
               className="flex w-full justify-start pl-3 mt-2 items-center text-gray-500 gap-3"
             >
               <div
-                className={`w-3 h-3 bg-${event.label}-200 rounded-full`}
+                className={`w-3 h-3 bg-${event.color}-200 rounded-full`}
               ></div>
               <button className="font-semibold text-xs ">
                 {" "}
-                {event.startTime.format("HH:mm")}{" "}
+                {dayjs.utc(event.startTime).local().format("HH:mm")}{" "}
               </button>
               <p className="text-xs"> {event.title} </p>
             </div>
