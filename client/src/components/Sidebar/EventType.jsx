@@ -153,12 +153,14 @@ export default function EventType() {
                               {eventType}
                             </label>
                           </div>
-                          <Menu.Button>
-                            <DotsVerticalIcon
-                              className="-mr-1 h-5 w-5 text-white mt-1 group-hover:text-gray-400"
-                              aria-hidden="true"
-                            />
-                          </Menu.Button>
+                          {index !== 0 && (
+                            <Menu.Button>
+                              <DotsVerticalIcon
+                                className="-mr-1 h-5 w-5 text-white mt-1 group-hover:text-gray-400"
+                                aria-hidden="true"
+                              />
+                            </Menu.Button>
+                          )}
                         </div>
 
                         <Transition

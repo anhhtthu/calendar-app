@@ -31,8 +31,11 @@ export default function CreateEventModal() {
     selectedEvent,
     setSelectedEvent,
   } = useContext(GlobalContext);
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState(
+    selectedEvent ? selectedEvent.location : ""
+  );
   const [title, setTitle] = useState(selectedEvent ? selectedEvent.title : "");
+  const [inputWarning, setInputWarning] = useState(false);
   const [collaborator, setCollaborator] = useState("");
   const [description, setDescription] = useState(
     selectedEvent ? selectedEvent.description : ""
@@ -77,6 +80,7 @@ export default function CreateEventModal() {
   //desc: handle submit event
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (title === "") return setInputWarning(true);
 
     //convert time to dayjs
     const startTimeDayjs = dayjs(startTime, "HH:mm");
@@ -86,7 +90,7 @@ export default function CreateEventModal() {
       calendarId: calendarId,
       title: title,
       description: description,
-      location: "vietnam",
+      location: location,
       date: chosenDate,
       startTime: startTimeDayjs,
       endTime: endTimeDayjs,
@@ -104,6 +108,7 @@ export default function CreateEventModal() {
     }
     setShowModal(false);
     setSelectedEvent(null);
+    setInputWarning(false);
   };
 
   useEffect(() => {
@@ -159,7 +164,7 @@ export default function CreateEventModal() {
                 <AiOutlineClose className="text-gray-400 text-xl" />
               </button>
             </header>
-            <main className="p-4 text-gray-500 max-h-[40rem] overflow-auto scrollbar scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
+            <main className="p-4 text-gray-500 max-h-[30rem] overflow-auto scrollbar scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                   <label htmlFor="title">Title</label>
@@ -170,8 +175,13 @@ export default function CreateEventModal() {
                     id="title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="border border-gray-300 rounded-md p-2"
+                    className="border border-gray-300 rounded-md p-2 placeholder:text-gray-400 text-sm"
                   />
+                  {inputWarning && (
+                    <p className="text-xs text-red-600 italic">
+                      Title cannot be empty
+                    </p>
+                  )}
                 </div>
                 <div className="flex flex-col gap-2">
                   <label htmlFor="description">Description</label>
@@ -179,11 +189,13 @@ export default function CreateEventModal() {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Event Description"
-                    className="border border-gray-300 rounded-md p-2"
+                    className="border border-gray-300 rounded-md p-2 placeholder:text-gray-400 text-sm"
                   ></textarea>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="title">Choose your collaborator</label>
+                  <label htmlFor="title">
+                    Choose your collaborator (by email)
+                  </label>
                   <input
                     placeholder="Add your collaborator"
                     type="text"
@@ -191,7 +203,19 @@ export default function CreateEventModal() {
                     id="collaborator"
                     value={collaborator}
                     onChange={(e) => setCollaborator(e.target.value)}
-                    className="border border-gray-300 rounded-md p-2"
+                    className="border border-gray-300 rounded-md p-2 placeholder:text-gray-400 text-sm"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="title">Your location</label>
+                  <input
+                    placeholder="Add location"
+                    type="text"
+                    name="location"
+                    id="location"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="border border-gray-300 rounded-md p-2 placeholder:text-gray-400 text-sm"
                   />
                 </div>
                 <div className="flex flex-1 gap-4 justify-between">
@@ -201,7 +225,7 @@ export default function CreateEventModal() {
                       type="date"
                       value={chosenDate}
                       onChange={(e) => setChosenDate(e.target.value)}
-                      className="border border-gray-300 rounded-md p-2"
+                      className="border border-gray-300 rounded-md p-2 placeholder:text-gray-400 text-sm"
                     />
                   </div>
                   <div className="flex flex-col gap-2 w-1/2">
@@ -260,7 +284,7 @@ export default function CreateEventModal() {
                   >
                     <label htmlFor="">Choose your event type</label>
                     <div className="w-1/2">
-                      <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2  text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                      <Menu.Button className="inline-flex text-sm w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-gray-600 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                         {!eventType ? totalEventTypes[0] : eventType}
                         <ChevronDownIcon
                           className="-mr-1 h-5 w-5 text-gray-400 mt-1"

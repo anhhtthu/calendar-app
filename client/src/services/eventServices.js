@@ -24,12 +24,25 @@ const handleErrors = (error) => {
   throw error;
 };
 
+export async function getEvents(startTime, endTime) {
+  try {
+    const response = await axios.get(
+      `${ROUTES.EVENTS.BASE}?customStartTime=${startTime}&customEndTime=${endTime}`,
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(response);
+  } catch (error) {
+    handleErrors(error);
+  }
+}
+
 export async function createEvent(event) {
   try {
     const response = await axios.post(ROUTES.EVENTS.BASE, event, {
       withCredentials: true,
     });
-    console.log(response);
     return response.data;
   } catch (error) {
     handleErrors(error);
@@ -45,7 +58,6 @@ export async function updateEvent(event, eventId) {
         withCredentials: true,
       }
     );
-    console.log(response);
     return response.data;
   } catch (error) {
     handleErrors(error);
@@ -57,62 +69,8 @@ export async function deleteEvent(eventId) {
     const response = await axios.delete(`${ROUTES.EVENTS.BASE}/${eventId}`, {
       withCredentials: true,
     });
-    console.log(response);
     return response.data;
   } catch (error) {
     handleErrors(error);
   }
 }
-
-// export async function getEvents() {
-//   try {
-//     const response = await fetch(ROUTES.EVENTS.BASE.GET, {
-//       withCredentials: true,
-//     });
-//     return response.data;
-//   } catch (error) {
-//     handleErrors(error);
-//   }
-// }
-
-//Purpose: To fetch events from server
-// export async function fetchEvents() {
-//   try {
-//     const response = await fetch(`/api/events`);
-//     if (!response.ok) {
-//       throw new Error();
-//     }
-//     const data = await response.json();
-//     return data;
-//   } catch (error) {
-//     console.log("Failed to fetch events: ", error);
-//     return [];
-//   }
-// }
-
-// Purpose: To save events to local storage
-export function saveCalendarEvents(events) {
-  localStorage.setItem("savedEvents", JSON.stringify(events));
-}
-
-//Purpose: To save events to server
-// export async function savedEvents(events) {
-//   try {
-//     const response = await fetch(`/api/events`, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//         //put token here
-//       },
-//       body: JSON.stringify(events),
-//     });
-//     if (!response.ok) {
-//       throw new Error();
-//     }
-//     const data = await response.json();
-//     return data;
-//   } catch (error) {
-//     console.log("Failed to save events: ", error);
-//     throw error;
-//   }
-// }

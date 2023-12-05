@@ -6,11 +6,7 @@ import {
   savedEventsReducer,
   eventTypesReducer,
 } from "../Reducers/eventReducer";
-import {
-  fetchEvents,
-  saveCalendarEvents,
-  getEvents,
-} from "../services/eventServices";
+
 import { calendarGet, getCalendar } from "../services/calendarService";
 
 export default function ContextWrapper({ children }) {
@@ -66,9 +62,6 @@ export default function ContextWrapper({ children }) {
   console.log("savedEvents", savedEvents);
 
   //update savedEvents state when savedEvents is updated
-  useEffect(() => {
-    saveCalendarEvents(savedEvents);
-  }, [savedEvents]);
 
   //set monthIndex to smallCalendarMonth when smallCalendarMonth is updated
   useEffect(() => {
@@ -91,15 +84,15 @@ export default function ContextWrapper({ children }) {
     }
   }, [location]);
 
-  //initialize eventTypes state when savedEvents is updated
-  // useEffect(() => {
-  //   if (savedEvents && savedEvents.length > 0) {
-  //     eventTypesDispatch({
-  //       type: "INITIAL_EVENT_TYPE",
-  //       payload: savedEvents.totalEventTypes,
-  //     });
-  //   }
-  // }, [savedEvents]);
+  // initialize eventTypes state when savedEvents is updated
+  useEffect(() => {
+    if (savedEvents && savedEvents.length > 0) {
+      eventTypesDispatch({
+        type: "INITIAL_EVENT_TYPE",
+        payload: savedEvents.totalEventTypes,
+      });
+    }
+  }, [savedEvents]);
 
   //fetch event types from database and initialize eventTypes state
   useEffect(() => {
@@ -115,7 +108,7 @@ export default function ContextWrapper({ children }) {
           setCalendarId(response.data.id);
         }
       } catch (error) {
-        // console.log(error);
+        console.log(error);
       }
     };
     getCalendar();
@@ -193,7 +186,6 @@ export default function ContextWrapper({ children }) {
         checkedLabel,
         calendarId,
         setIsDisplayEvent,
-        isDisplayEvent,
       }}
     >
       {children}
