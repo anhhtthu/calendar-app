@@ -26,7 +26,7 @@ exports.login = async (req, res, next) => {
 
     // set refreshToken as httpOnly cookie
     res.setRefreshTokenCookie(refreshToken);
-    console.log("Response headers:", res.getHeaders());
+
     res.sendData("User login successfully", {
       accessToken: accessToken,
     });
@@ -39,7 +39,6 @@ exports.login = async (req, res, next) => {
 exports.refreshToken = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
-    console.log("BE get refresh token from cookies: ", refreshToken);
     if (!refreshToken) {
       throw new CustomError(
         401,
