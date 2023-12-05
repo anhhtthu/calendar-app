@@ -25,12 +25,8 @@ exports.login = async (req, res, next) => {
     await tokenService.storedRefreshToken(user.id, refreshToken);
 
     // set refreshToken as httpOnly cookie
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    });
-
+    res.setRefreshTokenCookie(refreshToken);
+    console.log("Response headers:", res.getHeaders());
     res.sendData("User login successfully", {
       accessToken: accessToken,
     });
@@ -43,6 +39,7 @@ exports.login = async (req, res, next) => {
 exports.refreshToken = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
+    console.log("BE get refresh token from cookies: ", refreshToken);
     if (!refreshToken) {
       throw new CustomError(
         401,

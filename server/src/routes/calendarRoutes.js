@@ -11,7 +11,5 @@ router.use(authenticateToken);
 router.post("/", calendarController.createCalendar);
 router.get("/", calendarController.getCalendar);
 router.put("/", calendarController.updateCalendar);
-// router.get(ROUTES.EVENTS.GET_BY_ID, eventController.getEventById);
-// router.delete(ROUTES.EVENTS.DELETE, eventController.deleteEvent);
 
 module.exports = router;

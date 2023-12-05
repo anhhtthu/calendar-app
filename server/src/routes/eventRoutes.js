@@ -6,7 +6,7 @@ const ROUTES = require("../constants/routePaths");
 const router = express.Router();
 
 // Authenticate JWT
-// router.use(authenticateToken);
+router.use(authenticateToken);
 
 router.post(ROUTES.EVENTS.CREATE, eventController.createEvent);
 router.get(ROUTES.EVENTS.GET, eventController.listEvents);

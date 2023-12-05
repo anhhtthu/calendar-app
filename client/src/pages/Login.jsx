@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ROUTES } from "../constant/apiPath";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -20,16 +21,15 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent default form submission
     try {
-      const response = await axios.post(
-        "http://localhost:3001/api/v1/auth/login",
-        {
-          username,
-          password,
-        }
-      );
-      const accessToken = response.data.accessToken;
+      const response = await axios.post(ROUTES.AUTH.BASE + "/login", {
+        username,
+        password,
+      });
+
+      const accessToken = response.data.data.accessToken;
       sessionStorage.setItem("accessToken", accessToken);
-      navigate("/calendar/weekview");
+
+      navigate("/calendar");
     } catch (error) {
       console.error("Login failed", error);
       setLoginError("Login failed. Please check your email or password.");

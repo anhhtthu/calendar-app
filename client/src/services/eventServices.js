@@ -1,3 +1,4 @@
+import apiClient from "../api/apiClient";
 import { ROUTES } from "../constant/apiPath";
 import axios from "axios";
 
@@ -26,9 +27,7 @@ const handleErrors = (error) => {
 
 export async function createEvent(event) {
   try {
-    const response = await axios.post(ROUTES.EVENTS.BASE, event, {
-      withCredentials: true,
-    });
+    const response = await apiClient.post(ROUTES.EVENTS.BASE, event);
     console.log(response);
     return response.data;
   } catch (error) {
@@ -38,12 +37,9 @@ export async function createEvent(event) {
 
 export async function updateEvent(event, eventId) {
   try {
-    const response = await axios.put(
+    const response = await apiClient.put(
       `${ROUTES.EVENTS.BASE}/${eventId}`,
-      event,
-      {
-        withCredentials: true,
-      }
+      event
     );
     console.log(response);
     return response.data;
@@ -54,9 +50,7 @@ export async function updateEvent(event, eventId) {
 
 export async function deleteEvent(eventId) {
   try {
-    const response = await axios.delete(`${ROUTES.EVENTS.BASE}/${eventId}`, {
-      withCredentials: true,
-    });
+    const response = await axios.delete(`${ROUTES.EVENTS.BASE}/${eventId}`);
     console.log(response);
     return response.data;
   } catch (error) {
@@ -66,9 +60,7 @@ export async function deleteEvent(eventId) {
 
 export async function getEvents() {
   try {
-    const response = await fetch(ROUTES.EVENTS.BASE.GET, {
-      withCredentials: true,
-    });
+    const response = await fetch(ROUTES.EVENTS.BASE.GET);
     return response.data;
   } catch (error) {
     handleErrors(error);

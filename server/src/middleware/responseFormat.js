@@ -19,6 +19,15 @@ function responseFormat(req, res, next) {
     res.status(statusCode).json(response);
   };
 
+  res.setRefreshTokenCookie = function (refreshToken) {
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      path: "/",
+    });
+  };
+
   next();
 }
 
