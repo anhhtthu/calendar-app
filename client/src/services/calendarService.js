@@ -1,6 +1,4 @@
-import React from "react";
 import { ROUTES } from "../constant/apiPath";
-import axios from "axios";
 import apiClient from "../api/apiClient";
 
 const handleErrors = (error) => {
@@ -44,7 +42,7 @@ export const calendarGet = async () => {
 
 export const calendarUpdate = async (eventTypes) => {
   try {
-    const response = await axios.put(ROUTES.CALENDARS.BASE, {
+    const response = await apiClient.put(ROUTES.CALENDARS.BASE, {
       totalEventTypes: eventTypes,
     });
     // console.log(response);
