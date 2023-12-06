@@ -4,14 +4,41 @@ import WeekBar from "../components/WeekBar";
 import { useState, useEffect, useContext } from "react";
 import GlobalContext from "../context/GlobalContext";
 import { getMonth } from "../utils/index";
+import { getEvents } from "../services/eventServices";
+import dayjs, { utc } from "dayjs";
+import { useNavigate } from "react-router-dom";
 
 export default function MonthViewCalendar() {
+  dayjs.extend(utc);
+  const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(getMonth());
-  const { monthIndex } = useContext(GlobalContext);
+  const { monthIndex, dispatchCalendarEvent } = useContext(GlobalContext);
 
   useEffect(() => {
     setCurrentMonth(getMonth(monthIndex));
-  }, [monthIndex]);
+
+    const getWeekEvents = async () => {
+      try {
+        const startDay = getMonth(monthIndex)[0][0]
+          .startOf("month")
+          .utc()
+          .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+        const endDay = getMonth(monthIndex)[4][6]
+          .endOf("month")
+          .utc()
+          .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+
+        const response = await getEvents(startDay, endDay, navigate);
+        if (response) {
+          dispatchCalendarEvent({
+            type: "INITIAL_EVENT",
+            payload: response.data,
+          });
+        }
+      } catch (error) {}
+    };
+    getWeekEvents();
+  }, [monthIndex, navigate, dispatchCalendarEvent]);
 
   return (
     <div className="flex flex-1 flex-col px-5">

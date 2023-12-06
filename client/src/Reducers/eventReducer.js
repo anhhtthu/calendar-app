@@ -3,6 +3,7 @@
 export function savedEventsReducer(state, { type, payload }) {
   switch (type) {
     case "INITIAL_EVENT":
+      console.log("payload in event reducer", payload);
       return payload;
     case "CREATE_EVENT":
       return [...state, payload];

@@ -1,14 +1,45 @@
 import React, { useEffect, useState, useContext } from "react";
 import Week from "../components/Week/Week";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { getWeek } from "../utils";
 import GlobalContext from "../context/GlobalContext";
+import { getEvents } from "../services/eventServices";
+import dayjs, { utc } from "dayjs";
 export default function WeekViewCalendar() {
-  const { weekIndex } = useContext(GlobalContext);
+  const navigate = useNavigate();
+  dayjs.extend(utc);
+  const { weekIndex, dispatchCalendarEvent } = useContext(GlobalContext);
   const [currentWeek, setCurrentWeek] = useState(getWeek());
   useEffect(() => {
     setCurrentWeek(getWeek(weekIndex));
   }, [weekIndex]);
+
+  useEffect(() => {
+    const getWeekEvents = async () => {
+      try {
+        const startDay = getWeek(weekIndex)[0][0]
+          .utc()
+          .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+        const endDay = getWeek(weekIndex)[23][6]
+          .utc()
+          .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+        console.log("startDay", startDay);
+        console.log("endDay", endDay);
+        console.log("current week", currentWeek);
+        const response = await getEvents(startDay, endDay, navigate);
+        if (response) {
+          dispatchCalendarEvent({
+            type: "INITIAL_EVENT",
+            payload: response.data,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getWeekEvents();
+  }, [currentWeek]);
 
   return (
     <motion.div

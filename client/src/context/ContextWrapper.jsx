@@ -7,8 +7,6 @@ import {
   eventTypesReducer,
 } from "../Reducers/eventReducer";
 
-import { calendarGet, getCalendar } from "../services/calendarService";
-
 export default function ContextWrapper({ children }) {
   const [monthIndex, setMonthIndex] = useState(dayjs());
   const [trigger, setTrigger] = useState(false);
@@ -85,7 +83,7 @@ export default function ContextWrapper({ children }) {
   }, [location]);
 
   useEffect(() => {
-    console.log("totalEventTypes", totalEventTypes);
+    console.log("savedEvent after fetch from server", savedEvents);
   }, [totalEventTypes]);
 
   return (

@@ -1,6 +1,6 @@
 import axios from "axios";
 const { ROUTES } = require("../constant/apiPath");
-const { useNavigate } = require("react-router-dom");
+// const { useNavigate } = require("react-router-dom");
 
 const API_PATH = "http://localhost:3001/api/v1";
 
@@ -45,8 +45,8 @@ apiClient.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return apiClient;
       } catch (refreshTokenError) {
-        const navigate = useNavigate();
-        navigate("/login");
+        // const navigate = useNavigate();
+        // navigate("/login");
         return Promise.reject(refreshTokenError);
       }
     }

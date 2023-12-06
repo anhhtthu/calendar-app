@@ -40,10 +40,6 @@ export default function Week(props) {
   }
 
   useEffect(() => {
-    console.log("week row height", rowHeight);
-  }, [rowHeight]);
-
-  useEffect(() => {
     const events = savedEvents.filter((event) => {
       const eventDate = dayjs(event.date);
 
@@ -74,7 +70,6 @@ export default function Week(props) {
   function countOverlap() {
     const eventsGroupByDay = weekEvents.reduce((groups, event) => {
       const day = dayjs(event.date).day();
-      console.log("day in countOverlap", day);
       if (!groups[day]) {
         groups[day] = [];
       }
@@ -124,12 +119,7 @@ export default function Week(props) {
   }
 
   useEffect(() => {
-    console.log("widthEvents", widthEvents);
-  }, [widthEvents]);
-
-  useEffect(() => {
     countOverlap();
-    console.log("is running");
   }, [weekEvents]);
 
   return (
@@ -141,7 +131,7 @@ export default function Week(props) {
           variants={calendarVariants(direction)}
           animate="visible"
           initial={isFirstMount ? "visible" : "hidden"}
-          key={weekIndex}
+          // key={weekIndex}
         >
           {week[0].map((hour, index) => (
             <div
@@ -161,7 +151,7 @@ export default function Week(props) {
         variants={calendarVariants(direction)}
         animate="visible"
         initial={isFirstMount ? "visible" : "hidden"}
-        key={weekIndex}
+        // key={weekIndex}
       >
         <div className="grid grid-rows-24  ">
           {Array.from({ length: 24 }, (_, index) => (
@@ -177,8 +167,8 @@ export default function Week(props) {
           {week.map((day, dayIndex) => (
             <React.Fragment key={dayIndex}>
               {day.map((hour, hourIndex) => (
-                <div ref={hourIndex === 0 ? rowRef : null}>
-                  <HourInDayWeek key={hourIndex} hour={hour} />
+                <div ref={hourIndex === 0 ? rowRef : null} key={hourIndex}>
+                  <HourInDayWeek hour={hour} />
                 </div>
               ))}
 

@@ -35,8 +35,8 @@ export default function Day(props) {
           dayjs(event.date).format("DD-MM-YY") === hours[0].format("DD-MM-YY")
       )
       .map((event) => {
-        const startRow = dayjs.utc(event.startTime).local().hour();
-        const endRow = dayjs.utc(event.endTime).local().hour();
+        const startRow = dayjs(event.startTime).local().hour();
+        const endRow = dayjs(event.endTime).local().hour();
         const span = endRow - startRow;
 
         return { ...event, startRow, endRow, span };
@@ -185,7 +185,7 @@ export default function Day(props) {
                       event.color
                     }-200 ml-20 z-10 ${widthEvents.get(
                       event.id
-                    )} absolute opacity-60 p-2 mr-2 cursor-pointer text-gray-500 rounded-md border border-white mb-1 truncate`}
+                    )} absolute p-2 mr-2 cursor-pointer text-gray-500 rounded-md border border-white mb-1 truncate`}
                     style={{
                       top: `${startRow * rowHeight}px`,
                       height: `${span * rowHeight}px`,

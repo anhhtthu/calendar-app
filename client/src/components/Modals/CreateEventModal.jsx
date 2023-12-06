@@ -1,4 +1,5 @@
 import React, { useContext, useState, Fragment, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { modalVariants } from "../../animations/modalVariants";
 import { AiOutlineClose } from "react-icons/ai";
@@ -20,6 +21,7 @@ dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 
 export default function CreateEventModal() {
+  const navigate = useNavigate();
   const {
     showModal,
     setShowModal,
@@ -81,10 +83,20 @@ export default function CreateEventModal() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (title === "") return setInputWarning(true);
-
+    const selectedDate = dayjs(chosenDate);
     //convert time to dayjs
-    const startTimeDayjs = dayjs(startTime, "HH:mm");
-    const endTimeDayjs = dayjs(endTime, "HH:mm");
+    const startTimeDayjs = selectedDate
+      .hour(dayjs(startTime, "HH:mm").hour())
+      .minute(dayjs(startTime, "HH:mm").minute())
+      .utc()
+      .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+
+    const endTimeDayjs = selectedDate
+      .hour(dayjs(endTime, "HH:mm").hour())
+      .minute(dayjs(endTime, "HH:mm").minute())
+      .utc()
+      .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+    console.log("startTimeDayjs", startTimeDayjs, endTimeDayjs);
 
     const newEvent = {
       calendarId: calendarId,
@@ -98,11 +110,11 @@ export default function CreateEventModal() {
       eventType: eventType,
     };
     if (selectedEvent) {
-      const res = await updateEvent(newEvent, selectedEvent.id);
+      const res = await updateEvent(newEvent, selectedEvent.id, navigate);
       dispatchCalendarEvent({ type: "UPDATE_EVENT", payload: res.data });
       console.log("update event", res);
     } else {
-      const res = await createEvent(newEvent);
+      const res = await createEvent(newEvent, navigate);
       dispatchCalendarEvent({ type: "CREATE_EVENT", payload: res.data });
 
       // const realTime = dayjs.utc(res.data.startTime);
@@ -118,7 +130,7 @@ export default function CreateEventModal() {
 
   const handleDeleteEvent = async (e) => {
     e.preventDefault();
-    const res = await deleteEvent(selectedEvent.id);
+    const res = await deleteEvent(selectedEvent.id, navigate);
     console.log("delete event", res);
     dispatchCalendarEvent({ type: "REMOVE_EVENT", payload: selectedEvent });
     setShowModal(false);
