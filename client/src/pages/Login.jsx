@@ -19,9 +19,9 @@ export default function Login() {
   };
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
     try {
-      const response = await axios.post(ROUTES.AUTH.BASE + "/login", {
+      const response = await axios.post(ROUTES.AUTH.BASE + ROUTES.AUTH.LOGIN, {
         username,
         password,
       });
@@ -32,7 +32,12 @@ export default function Login() {
       navigate("/calendar");
     } catch (error) {
       console.error("Login failed", error);
-      setLoginError("Login failed. Please check your email or password.");
+
+      if (error.response.data.errorCode === 1100) {
+        setLoginError("Username or password is required");
+      } else {
+        setLoginError("Login failed. Please check your email or password");
+      }
     }
   };
 
