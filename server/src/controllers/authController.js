@@ -37,16 +37,16 @@ exports.login = async (req, res, next) => {
 };
 
 exports.refreshToken = async (req, res, next) => {
-  try {
-    const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) {
-      throw new CustomError(
-        401,
-        ERROR_CODE.TOKEN_REQUIRED,
-        "Refresh token required"
-      );
-    }
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    throw new CustomError(
+      401,
+      ERROR_CODE.TOKEN_REQUIRED,
+      "Refresh token required"
+    );
+  }
 
+  try {
     const { userId } = await tokenService.verifyRefreshToken(refreshToken);
 
     const newAccessToken = await tokenService.generateAccessToken(userId);
@@ -61,9 +61,9 @@ exports.refreshToken = async (req, res, next) => {
 };
 
 exports.invalidateToken = async (req, res, next) => {
-  const token = req.body.refreshToken;
+  const refreshToken = req.cookies.refreshToken;
   try {
-    await tokenService.invalidateToken(token);
+    await tokenService.invalidateToken(refreshToken);
     res.sendData("Revoke token successfully");
   } catch (error) {
     logger.errorf("Error invalidating token: %v", error);
