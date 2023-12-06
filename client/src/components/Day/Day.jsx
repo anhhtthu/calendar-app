@@ -49,6 +49,7 @@ export default function Day(props) {
     setDateModal(hour);
   };
 
+  //desc: check if the event overlap with other events
   function checkOverlap(event1, event2) {
     const startEvent1 = dayjs.utc(event1.startTime).local().hour();
     const startEvent2 = dayjs.utc(event2.startTime).local().hour();
@@ -61,6 +62,7 @@ export default function Day(props) {
 
   const newWidths = useRef(new Map());
 
+  //desc: count the number of overlap events to set the width of the event
   function countOverlap() {
     // if (isDisplayEvent) {
     let newEvents = [...dayEvents]; // create a copy of dayEvents
@@ -99,38 +101,6 @@ export default function Day(props) {
 
       newEvents = newEvents.filter((e) => e.id !== event.id); // remove the event from newEvents
     }
-    // } else {
-    //   dayEvents.forEach((event) => {
-    //     const numberOfOverlap = dayEvents.filter(
-    //       (otherEvent) =>
-    //         otherEvent.id !== event.id && checkOverlap(event, otherEvent)
-    //     ).length;
-    //     let eventWidth;
-    //     switch (numberOfOverlap) {
-    //       case 0:
-    //         eventWidth = "w-11/12 float-right";
-    //         break;
-    //       case 1:
-    //         eventWidth = "w-9/12 float-right";
-    //         break;
-    //       case 2:
-    //         eventWidth = "w-7/12 float-right";
-    //         break;
-    //       case 3:
-    //         eventWidth = "w-5/12 float-right";
-    //         break;
-    //       case 4:
-    //         eventWidth = "w-3/12 float-right";
-    //         break;
-    //       default:
-    //         eventWidth = "w-1/12 float-right";
-    //         break;
-    //     }
-    //     if (!newWidths.current.has(event.id)) {
-    //       newWidths.current.set(event.id, eventWidth);
-    //     }
-    //   });
-    // }
 
     setWidthEvents(new Map(newWidths.current));
   }

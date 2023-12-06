@@ -3,6 +3,7 @@ import NavigateButton from "./NavigateButton";
 import AddEventButton from "./AddEventButton";
 import CalendarViewSwitcher from "./CalendarViewSwitcher";
 import SelectedTimeDisplay from "./SelectedTimeDisplay";
+import Logout from "./Logout";
 
 export default function Header() {
   return (
@@ -16,6 +17,7 @@ export default function Header() {
       <div className="w-1/3 flex justify-end gap-4">
         <NavigateButton />
         <AddEventButton />
+        <Logout />
       </div>
     </div>
   );
