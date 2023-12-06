@@ -1,6 +1,5 @@
 import apiClient from "../api/apiClient";
 import { ROUTES } from "../constant/apiPath";
-import axios from "axios";
 
 // Purpose: To provide functions for fetching and saving events to local storage
 export function fetchEvents() {
@@ -25,31 +24,35 @@ const handleErrors = (error) => {
   throw error;
 };
 
-export async function getEvents(startTime, endTime) {
+export async function getEvents(startTime, endTime, navigate) {
   try {
-    const response = await axios.get(
-      `${ROUTES.EVENTS.BASE}?customStartTime=${startTime}&customEndTime=${endTime}`,
-      {
-        withCredentials: true,
-      }
+    const response = await apiClient.get(
+      `${ROUTES.EVENTS.BASE}?customStartTime=${startTime}&customEndTime=${endTime}`
     );
-    console.log(response);
+    console.log(response.data.data);
+    return response.data;
   } catch (error) {
+    if (error.response && error.response.status === 403) {
+      navigate("/login");
+    }
     handleErrors(error);
   }
 }
 
-export async function createEvent(event) {
+export async function createEvent(event, navigate) {
   try {
     const response = await apiClient.post(ROUTES.EVENTS.BASE, event);
     console.log(response);
     return response.data;
   } catch (error) {
+    if (error.response && error.response.status === 403) {
+      navigate("/login");
+    }
     handleErrors(error);
   }
 }
 
-export async function updateEvent(event, eventId) {
+export async function updateEvent(event, eventId, navigate) {
   try {
     const response = await apiClient.put(
       `${ROUTES.EVENTS.BASE}/${eventId}`,
@@ -57,16 +60,22 @@ export async function updateEvent(event, eventId) {
     );
     return response.data;
   } catch (error) {
+    if (error.response && error.response.status === 403) {
+      navigate("/login");
+    }
     handleErrors(error);
   }
 }
 
-export async function deleteEvent(eventId) {
+export async function deleteEvent(eventId, navigate) {
   try {
-    const response = await axios.delete(`${ROUTES.EVENTS.BASE}/${eventId}`);
+    const response = await apiClient.delete(`${ROUTES.EVENTS.BASE}/${eventId}`);
     console.log(response);
     return response.data;
   } catch (error) {
+    if (error.response && error.response.status === 403) {
+      navigate("/login");
+    }
     handleErrors(error);
   }
 }
