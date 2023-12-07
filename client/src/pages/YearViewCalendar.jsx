@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { getYear } from "../utils";
 import Year from "../components/Year/Year";
 import { getEvents } from "../services/eventServices";
+import { motion } from "framer-motion";
 import utc from "dayjs/plugin/utc";
 import GlobalContext from "../context/GlobalContext";
 import dayjs from "dayjs";
@@ -42,8 +43,14 @@ export default function YearViewCalendar() {
     getYearEvents();
   }, [currentYear]);
   return (
-    <div className="flex flex-col items-center px-5">
+    <motion.div
+    
+      className="flex flex-col items-center px-5"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <Year year={currentYear} />
-    </div>
+    </motion.div>
   );
 }

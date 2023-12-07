@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import GlobalContext from "../../context/GlobalContext";
 import YearEventModal from "../Modals/YearEventModal";
+import { motion } from "framer-motion";
 import dayjs from "dayjs";
 
 export default function Year({ year }) {
@@ -20,10 +21,12 @@ export default function Year({ year }) {
       "flex",
       "items-center",
       "justify-center",
-      "w-6",
-      "h-6",
+      // "w-full",
       "rounded-full",
       "cursor-pointer",
+      "text-center",
+      "py-2",
+      "px-2",
     ];
 
     if (today === currentDay && date.month() === i) {
@@ -73,7 +76,10 @@ export default function Year({ year }) {
   }, [year]);
 
   return (
-    <div className="grid grid-cols-4 gap-4 p-4 overflow-auto h-[650px] scrollbar scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
+    <motion.div
+      className="grid grid-cols-4 gap-10 p-4 w-full overflow-auto max-h-[85vh] scrollbar scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100"
+      layout
+    >
       {year.map((month, i) => {
         // Find the first day that actually belongs to the current month
         const firstDay = month.flat().find((day) => day.month() === i);
@@ -83,9 +89,12 @@ export default function Year({ year }) {
             <h2 className="text-left pl-2 font-semibold text-gray-500 text-sm mb-2">
               {firstDay ? firstDay.format("MMMM") : ""}
             </h2>
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 flex justify-center text-center gap-1">
               {daysOfWeek.map((day, j) => (
-                <div key={j} className="px-1 py-1 text-center text-gray-500">
+                <div
+                  key={j}
+                  className="px-1 py-1 flex justify-center text-gray-500"
+                >
                   {day}
                 </div>
               ))}
@@ -114,6 +123,6 @@ export default function Year({ year }) {
           setModalSize={setModalSize}
         />
       )}
-    </div>
+    </motion.div>
   );
 }

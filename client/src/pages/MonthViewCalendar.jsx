@@ -5,6 +5,7 @@ import { useState, useEffect, useContext } from "react";
 import GlobalContext from "../context/GlobalContext";
 import { getMonth } from "../utils/index";
 import { getEvents } from "../services/eventServices";
+import { motion } from "framer-motion";
 import dayjs, { utc } from "dayjs";
 import { useNavigate } from "react-router-dom";
 
@@ -41,9 +42,14 @@ export default function MonthViewCalendar() {
   }, [monthIndex, navigate, dispatchCalendarEvent]);
 
   return (
-    <div className="flex flex-1 flex-col px-5">
+    <motion.div
+      className="flex flex-1 flex-col px-5"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <WeekBar />
       <Month month={currentMonth} />
-    </div>
+    </motion.div>
   );
 }

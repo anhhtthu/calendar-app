@@ -11,6 +11,8 @@ export default function WeekViewCalendar() {
   dayjs.extend(utc);
   const { weekIndex, dispatchCalendarEvent } = useContext(GlobalContext);
   const [currentWeek, setCurrentWeek] = useState(getWeek());
+  
+  //desc: set current week to the weekIndex
   useEffect(() => {
     setCurrentWeek(getWeek(weekIndex));
   }, [weekIndex]);

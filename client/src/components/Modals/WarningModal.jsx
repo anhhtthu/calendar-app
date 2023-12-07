@@ -8,7 +8,8 @@ export default function WarningModal() {
   const generateWarning = () => {
     let warning;
     if (showModal) {
-      warning = "Are you sure you want to delete this event?";
+      warning =
+        "Closing the modal will discard your event. Are you sure this is what you want?";
       return warning;
     }
   };
