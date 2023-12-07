@@ -48,7 +48,9 @@ export default function Login() {
         onSubmit={handleLogin}
       >
         <div>
-          <p className="text-gray-700 text-4xl mb-6">Welcome back!</p>
+          <p className="text-gray-700 text-4xl mb-6">
+            Welcome to your Calendar!
+          </p>
           <h1 className="text-gray-600 text-2xl mb-5">Login to your account</h1>
         </div>
 

@@ -47,7 +47,7 @@ app.use(errorHandler);
 //     sendNotification();
 //   },
 //   null,
-//   true,
+//   true
 // );
 // logger.info("After job instantiation");
 // job.start();
