@@ -53,7 +53,7 @@ export default function DayViewCalendar() {
 
   return (
     <motion.div
-      className="flex flex-1 flex-col px-5 "
+      className="flex flex-1 flex-col px-5 h-11/12 "
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

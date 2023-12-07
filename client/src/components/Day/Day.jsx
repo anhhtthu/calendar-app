@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, useRef } from "react";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import GlobalContext from "../../context/GlobalContext";
+import { motion } from "framer-motion";
 
 export default function Day(props) {
   dayjs.extend(utc);
@@ -121,12 +122,12 @@ export default function Day(props) {
   // }, [dayEvents]);
 
   return (
-    <div>
+    <motion.div layout>
       <div className="ml-4 flex flex-col mb-4  bg-white">
         <span className="text-xs">{hours[0].format("dddd")}</span>
         <span className="text-4xl font-semibold">{hours[0].format("DD")}</span>
       </div>
-      <div className=" gap-2 relative overflow-auto h-[560px] m-2 border px-4 rounded-md scrollbar scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
+      <div className=" gap-2 relative overflow-auto max-h-[75vh] m-2 border px-4 rounded-md scrollbar scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
         {hours.map((hour, index) => (
           <div
             key={index}
@@ -176,6 +177,6 @@ export default function Day(props) {
           </div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

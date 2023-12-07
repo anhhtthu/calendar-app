@@ -128,9 +128,9 @@ export default function Week(props) {
         <div className="grid grid-cols-1 "></div>
         <motion.div
           className="grid grid-cols-7"
-          variants={calendarVariants(direction)}
-          animate="visible"
-          initial={isFirstMount ? "visible" : "hidden"}
+          // variants={calendarVariants(direction)}
+          // animate="visible"
+          // initial={isFirstMount ? "visible" : "hidden"}
           // key={weekIndex}
         >
           {week[0].map((hour, index) => (
@@ -147,17 +147,18 @@ export default function Week(props) {
         </motion.div>
       </div>
       <motion.div
-        className="justify-items-center pt-4 grid border mt-5  rounded-lg grid-cols-[1fr,11fr] h-[87%] overflow-auto scrollbar scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100"
-        variants={calendarVariants(direction)}
-        animate="visible"
-        initial={isFirstMount ? "visible" : "hidden"}
+        className="justify-items-center pt-4 grid w-full border mt-5 rounded-lg grid-cols-[1fr,11fr] h-[87%] overflow-auto scrollbar scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100"
+        // variants={calendarVariants(direction)}
+        // animate="visible"
+        // initial={isFirstMount ? "visible" : "hidden"}
+        layout
         // key={weekIndex}
       >
         <div className="grid grid-rows-24  ">
           {Array.from({ length: 24 }, (_, index) => (
             <p
               key={index}
-              className="text-md text-gray-400 font-semibold -mt-3 text-center"
+              className="text-md text-gray-400 font-semibold h-20 -mt-3 text-center"
             >
               {index}:00
             </p>
@@ -188,7 +189,7 @@ export default function Week(props) {
                     className={`absolute bg-${
                       event.color
                     }-200 ${widthEvents.get(event.id)} 
-                      p-2 cursor-pointer ml-5 text-gray-600 rounded-md border border-white mb-1 truncate`}
+                      p-2 cursor-pointer ml-7 text-gray-600 rounded-md border border-white mb-1 truncate`}
                     style={{
                       top: `${startRow * rowHeight}px`,
                       height: `${span * rowHeight}px`,

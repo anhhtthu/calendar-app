@@ -17,11 +17,11 @@ export default function Month(props) {
     <motion.div
       layout
       className="flex-1 grid grid-cols-7 grid-rows-5"
-      variants={calendarVariants(direction)}
-      initial={isFirstMount ? "visible" : "hidden"}
-      animate="visible"
-      exit="exit"
-      key={monthIndex}
+      // variants={calendarVariants(direction)}
+      // initial={isFirstMount ? "visible" : "hidden"}
+      // animate="visible"
+      // exit="exit"
+      // key={monthIndex}
     >
       {month.map((row, idx) => (
         <React.Fragment key={idx}>
